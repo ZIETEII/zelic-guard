@@ -13,15 +13,15 @@
 - [x] T006 Create `specs/001-zelic-guard/tasks.md`.
 - [x] T007 Create `docs/plans/2026-07-18-zelic-guard.md`.
 - [x] T008 Update `AGENTS.md` with repository rules and the verified `@vudovn/ag-kit@2026.7.18` incompatibility.
-- [ ] T009 Obtain human review of Phase 1 before production work.
+- [x] T009 Obtain human review of Phase 1 before production work.
 
 ## Phase 2 — Test harness and typed contracts
 
-- [ ] T010 Install only required packages: Zod, Vitest, jsdom, Testing Library, user-event, and coverage support if needed; update `package.json` scripts.
-- [ ] T011 Add `vitest.config.ts` and `src/test/setup.ts`; prove a deliberate harness test goes RED then GREEN.
-- [ ] T012 RED malformed contract and attempt tests in `tests/unit/guard/schemas.test.ts`.
-- [ ] T013 GREEN strict schemas in `src/lib/guard/schemas.ts`, inferred exports in `src/lib/guard/types.ts`, and reason codes in `src/lib/guard/reason-codes.ts`.
-- [ ] T014 REFACTOR schema factories and run focused/full suite; commit `test: establish guard schema contract`.
+- [x] T010 Install only required packages: Zod, Vitest, jsdom, Testing Library, user-event, and coverage support if needed; update `package.json` scripts.
+- [x] T011 Add `vitest.config.ts` and `src/test/setup.ts`; prove a deliberate harness test goes RED then GREEN.
+- [x] T012 RED malformed contract and attempt tests in `tests/unit/guard/schemas.test.ts`.
+- [x] T013 GREEN strict schemas in `src/lib/guard/schemas.ts`, inferred exports in `src/lib/guard/types.ts`, and reason codes in `src/lib/guard/reason-codes.ts`.
+- [x] T014 REFACTOR schema factories and run focused/full suite; intended commit `test: establish guard schema contract` is deferred because `.git` is read-only in this sandbox.
 
 ## Phase 3 — Stable contract identity
 
