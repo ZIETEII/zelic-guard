@@ -3,8 +3,8 @@ import { z } from "zod";
 import { fingerprintContract } from "./fingerprint";
 import {
   executionAttemptSchema,
+  executionHistorySnapshotSchema,
   executionVerdictSchema,
-  identifierSchema,
   intentContractSchema,
 } from "./schemas";
 import type {
@@ -18,10 +18,7 @@ const evaluationInputSchema = z.strictObject({
   contract: intentContractSchema,
   attempt: executionAttemptSchema,
   now: z.iso.datetime({ offset: true }),
-  history: z.strictObject({
-    successfulRuns: z.number().int().nonnegative(),
-    consumedExecutionIds: z.array(identifierSchema),
-  }),
+  history: executionHistorySnapshotSchema,
 });
 
 export class ContractIntegrityError extends Error {

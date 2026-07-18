@@ -84,6 +84,20 @@ export const executionAttemptSchema = z.strictObject({
     requestedAt: zonedDateTimeSchema,
   });
 
+export const executionHistorySnapshotSchema = z.strictObject({
+  successfulRuns: z.number().int().nonnegative(),
+  consumedExecutionIds: z
+    .array(identifierSchema)
+    .superRefine((executionIds, context) => {
+      if (new Set(executionIds).size !== executionIds.length) {
+        context.addIssue({
+          code: "custom",
+          message: "Consumed execution IDs must be unique",
+        });
+      }
+    }),
+});
+
 export const ruleIdSchema = z.enum([
   "contract_approved",
   "contract_not_expired",
@@ -108,4 +122,28 @@ export const executionVerdictSchema = z.strictObject({
   verdict: z.enum(["ALLOW", "DENY"]),
   reasonCodes: z.array(reasonCodeSchema).min(1),
   checks: z.array(ruleCheckSchema).length(10),
+});
+
+export const auditEventKindSchema = z.enum([
+  "contract_proposed",
+  "contract_approved",
+  "execution_allowed",
+  "execution_denied",
+  "contract_expired",
+  "lab_reset",
+]);
+
+export const auditEventInputSchema = z.strictObject({
+  sequence: z.number().int().nonnegative().max(999_999),
+  timestamp: zonedDateTimeSchema,
+  kind: auditEventKindSchema,
+  summary: z.string().trim().min(1).max(240),
+  reasonCodes: z.array(reasonCodeSchema).max(10),
+  contractId: identifierSchema.optional(),
+  executionId: identifierSchema.optional(),
+});
+
+export const auditEventSchema = auditEventInputSchema.extend({
+  schemaVersion: schemaVersionSchema,
+  id: identifierSchema,
 });

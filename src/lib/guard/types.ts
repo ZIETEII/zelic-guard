@@ -1,6 +1,9 @@
 import type { z } from "zod";
 
 import type {
+  auditEventInputSchema,
+  auditEventKindSchema,
+  auditEventSchema,
   contractConstraintsSchema,
   contractStatusSchema,
   executionVerdictSchema,
@@ -19,3 +22,6 @@ export type ReasonCode = z.infer<typeof reasonCodeSchema>;
 export type RuleId = z.infer<typeof ruleIdSchema>;
 export type RuleCheck = z.infer<typeof ruleCheckSchema>;
 export type ExecutionVerdict = z.infer<typeof executionVerdictSchema>;
+export type AuditEventKind = z.infer<typeof auditEventKindSchema>;
+export type AuditEventInput = z.infer<typeof auditEventInputSchema>;
+export type AuditEvent = z.infer<typeof auditEventSchema>;
