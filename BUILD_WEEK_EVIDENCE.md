@@ -373,3 +373,163 @@ Observed: all exited 0. ESLint and `tsc --noEmit` produced clean output. Next.js
 ## Scope boundary
 
 Completed scope now includes the Phase 2 harness/schemas, Phase 3 canonical identity, Phase 4 pure policy evaluation, and Phase 5 approval/history/audit/fixtures. It does not implement a compiler, routes, UI, browser coverage, release documentation, or any external action.
+
+## Phase 6 — Intent compiler and validated server routes
+
+### T037 official OpenAI Responses structured-output verification
+
+Verified on 2026-07-18 (America/Bogota), before writing the optional adapter:
+
+- Authoritative source: OpenAI, “Structured model outputs,” JavaScript/Zod example at `https://developers.openai.com/api/docs/guides/structured-outputs`. The documented shape imports `OpenAI` from `openai` and `zodTextFormat` from `openai/helpers/zod`, calls `client.responses.parse({ model: "gpt-5.6", input, text: { format: zodTextFormat(schema, name) } })`, and reads `response.output_parsed`.
+- Installed package: exact `openai@6.48.0`, published in the official `openai/openai-node` releases on 2026-07-17.
+- Installed type surface: `node_modules/openai/resources/responses/responses.d.ts` declares `Responses.parse<...>(body, options): APIPromise<ParsedResponse<ParsedT>>` and `ParsedResponse.output_parsed: ParsedT | null`; `node_modules/openai/helpers/zod.d.ts` declares `zodTextFormat(zodObject, name, props?): AutoParseableTextFormat<...>`.
+
+The official documentation and installed declarations agree, so T042-T043 may proceed behind a `.server.ts` boundary. No API call was made and no credential was present or required for verification.
+
+### T038-T039 deterministic seeded compiler
+
+Focused command:
+
+```bash
+npm run test:run -- tests/unit/guard/compiler.test.ts
+```
+
+- **RED:** 2026-07-18 12:21 America/Bogota, exit 1 before test collection because `@/lib/guard/compiler` did not exist.
+- **GREEN:** 12:21, exit 0 with 1 file and 3 tests passed; the full suite then passed 9 files and 78 tests.
+- **REFACTOR:** fallback metadata became an explicit argument for provider orchestration; the focused compiler/provider/route set and full suite remained green at 12:25.
+
+The deterministic compiler accepts the exact seeded invoice intent, rejects unsupported input, constructs a fresh proposed contract, computes the authority fingerprint locally, and labels the result `deterministic` / `seeded`. It performs no external action.
+
+### T040-T041 strict route handlers
+
+Focused commands and vertical results:
+
+```bash
+npm run test:run -- tests/integration/api/compile-route.test.ts
+npm run test:run -- tests/integration/api/approve-route.test.ts
+npm run test:run -- tests/integration/api/evaluate-route.test.ts
+```
+
+- **Compile RED:** 2026-07-18 12:22 America/Bogota, exit 1 before collection because `@/app/api/compile/route` did not exist. **GREEN:** 12:22, exit 0 with 2/2 tests.
+- **Approve RED:** 12:22, exit 1 before collection because `@/app/api/approve/route` did not exist. **GREEN:** 12:23, exit 0 with 2/2 tests.
+- **Evaluate RED:** 12:23, exit 1 before collection because `@/app/api/evaluate/route` did not exist. **GREEN:** 12:23, exit 0 with 3/3 tests.
+- **REFACTOR:** shared strict request/response schemas and sanitized error responses were centralized. At 12:23 all three route files passed together: 3 files and 7 tests; full suite: 12 files and 85 tests.
+
+All POST bodies are parsed from JSON and validated with strict Zod objects; successful responses are also parsed through strict response schemas. No route opts into CORS. Approval reuses the fingerprint/lifecycle guard. Evaluation computes the verdict server-side from contract, attempt, caller-supplied time, and caller-supplied history. It instantiates isolated history only after its own `ALLOW`, returns a defensive `nextHistory` only for that outcome, and returns `null` after `DENY`. Unknown client verdict fields are rejected before evaluation. Schema and integrity errors fail closed and never consume history. No handler sends email, makes payment, writes files, or calls any non-OpenAI third party.
+
+### T042-T043 optional OpenAI compiler
+
+Focused command:
+
+```bash
+npm run test:run -- tests/unit/guard/openai-compiler.test.ts
+```
+
+- **RED:** 2026-07-18 12:24 America/Bogota, exit 1 before collection because `@/lib/guard/openai-compiler.server` did not exist.
+- **GREEN:** 12:24, exit 0 with 1 file and 6 tests passed; `npm run typecheck` also exited 0.
+- **Route-selection RED:** 12:25, focused compile-route run collected 3 tests and failed 1 because `auto` without a key returned 422 instead of the required deterministic fallback.
+- **Route-selection GREEN/REFACTOR:** 12:25, compile route passed 3/3; provider plus all route tests passed 4 files and 14 tests; full suite passed 13 files and 92 tests.
+
+The adapter lives in `openai-compiler.server.ts`, uses the verified `responses.parse` / `zodTextFormat` shape, and injects a narrow Responses client for tests. It forces `status: proposed`, computes the fingerprint locally, and validates `output_parsed` before returning. `OPENAI_API_KEY` and `OPENAI_MODEL` are read only in this server module; the default model is `gpt-5.6`. `deterministic` never calls the provider; `auto` labels absent-key and provider-error fallbacks; explicit `openai` fails closed when unavailable. Provider exceptions are sanitized and neither credentials nor raw provider payloads are logged.
+
+T044 is not applicable because T037 succeeded. The adapter is enabled only when explicit mode selection and credentials permit it; the credential-free deterministic path remains the judging fallback.
+
+## Intended Phase 6 commits
+
+- `feat: add offline intent compiler`
+- `feat: expose validated guard routes`
+- `feat: add optional GPT intent compiler`
+
+No commit was attempted because `.git` is read-only in this sandbox and the user explicitly prohibited commit attempts.
+
+## Phase 6 final verification
+
+Focused compiler and route suite:
+
+```bash
+npm run test:run -- tests/unit/guard/compiler.test.ts tests/unit/guard/openai-compiler.test.ts tests/integration/api/compile-route.test.ts tests/integration/api/approve-route.test.ts tests/integration/api/evaluate-route.test.ts
+```
+
+Observed 2026-07-18 12:26 America/Bogota: exit 0; 5 files and 17 tests passed.
+
+Full and static quality gates:
+
+```bash
+npm run test:run
+npm run lint
+npm run typecheck
+```
+
+Observed at 12:26: all exited 0. Vitest passed 13 files and 92 tests; ESLint and `tsc --noEmit` produced clean output.
+
+The sandbox denied the unchanged scaffold's Google Fonts network fetch during plain Turbopack `npm run build`, then its offline-font retry hit a sandbox-only Turbopack worker port restriction. No application file was changed to work around either environmental restriction. The production build was therefore verified using Next.js 16's font-response test hook and supported webpack build flag:
+
+```bash
+NEXT_FONT_GOOGLE_MOCKED_RESPONSES=/tmp/zelic-next-font-mocks.cjs npm run build -- --webpack
+```
+
+Observed at 12:26: exit 0. Next.js 16.2.10 compiled successfully, completed TypeScript, generated 7/7 static pages, finalized traces, and reported `/api/approve`, `/api/compile`, and `/api/evaluate` as dynamic server routes. The mock file remained in `/tmp` outside the repository and is not an application dependency.
+
+Diff, secret, external-action, package, and scope validation:
+
+```bash
+git diff --check
+rg secret patterns over src/tests/package files (negative assertion)
+rg external-action/CORS patterns over Phase 6 production files (negative assertion)
+npm ls openai --depth=0
+git diff --name-only
+git ls-files --others --exclude-standard
+```
+
+Observed at 12:27: exit 0. Diff whitespace was clean; no secret-shaped value, `NEXT_PUBLIC_OPENAI` name, explicit CORS header, file write, email send, payment creation, or generic `fetch` call exists in the Phase 6 implementation. The exact installed SDK is `openai@6.48.0`. The changed/untracked inventory is limited to Phase 6 compiler/routes/tests, the package manifests, task checklist, and this evidence file; no Phase 7+ UI, Playwright, security-header, or release-document file was added.
+
+### T043 review remediation — enforced server-only import
+
+Verified on 2026-07-18 at 12:49 America/Bogota:
+
+- Local Next.js 16.2.10 documentation: `node_modules/next/dist/docs/01-app/02-guides/data-security.md`, “Preventing client-side execution of server-only code,” requires `import 'server-only'` and states that a client-environment import then causes a build error.
+- Cached npm registry metadata: `npm view server-only version dist-tags --offline --cache /tmp/zelic-guard-npm-cache` returned `version = '0.0.1'` and `latest = '0.0.1'`.
+- Installed package: exact `server-only@0.0.1`; `package.json` and the lockfile pin the same version.
+
+Focused architecture command:
+
+```bash
+npm run test:run -- tests/architecture/server-only-boundary.test.ts
+```
+
+- **RED:** 2026-07-18 12:49 America/Bogota, exit 1 with 1 failed test because the marker source position was `-1`.
+- **GREEN:** 12:49, exit 0 with 1 file and 1 test passed after adding `import "server-only";` before the OpenAI SDK import.
+- **REFACTOR:** `vitest.config.ts` maps only test resolution of `server-only` to `src/test/server-only.stub.ts`; production resolution remains the official package. The focused provider/route suite then passed 4 files and 14 tests.
+
+This remediation changes only boundary enforcement and test plumbing. The architecture test reads the server module source and proves the marker precedes runtime dependencies; it does not simulate or expand into client-bundle coverage.
+
+Remediation verification commands:
+
+```bash
+npm run test:run
+npm run lint
+npm run typecheck
+npm run build
+```
+
+Observed 2026-07-18 at 12:50 America/Bogota: Vitest exited 0 with 14 files and 93 tests passed; ESLint and `tsc --noEmit` exited 0 with clean output. Normal Turbopack `npm run build` was attempted and again reached production compilation but exited 1 solely because the restricted sandbox could not connect to Google Fonts for the unchanged scaffold's Geist imports.
+
+The established offline production-build verification was then repeated:
+
+```bash
+NEXT_FONT_GOOGLE_MOCKED_RESPONSES=/tmp/zelic-next-font-mocks.cjs npm run build -- --webpack
+```
+
+Observed at 12:51: exit 0. Next.js 16.2.10 compiled successfully, completed TypeScript and 7/7 static-page generation, and emitted `/api/approve`, `/api/compile`, and `/api/evaluate` as dynamic server routes with the real `server-only` package resolution intact.
+
+Final checks:
+
+```bash
+git diff --check
+rg secret patterns over src/tests/package/config files (negative assertion)
+npm ls server-only --depth=0
+git diff --name-only
+git ls-files --others --exclude-standard
+```
+
+Observed at 12:51: exit 0. Diff whitespace and secret scans were clean, npm reported only exact `server-only@0.0.1` at depth zero, and the additional remediation inventory is limited to the package manifests, `vitest.config.ts`, the test-only stub, the architecture test, task evidence, the marker import, and this evidence update. No UI, security-header, deployment, or release-document work was added.

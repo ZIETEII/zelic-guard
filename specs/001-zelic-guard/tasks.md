@@ -56,14 +56,15 @@
 
 ## Phase 6 — Intent compiler and server routes
 
-- [ ] T037 Verify official OpenAI SDK/Responses structured-output shape and record the source/date; do not code an unverified call.
-- [ ] T038 RED seeded compiler tests in `tests/unit/guard/compiler.test.ts`.
-- [ ] T039 GREEN `src/lib/guard/compiler.ts` and `src/lib/guard/deterministic-compiler.ts`; commit `feat: add offline intent compiler`.
-- [ ] T040 RED strict request/response tests for `POST /api/compile`, `/api/approve`, and `/api/evaluate`.
-- [ ] T041 GREEN Zod-validated handlers under `src/app/api/`; ensure no CORS and no external action; commit `feat: expose validated guard routes`.
-- [ ] T042 If and only if T037 succeeds, RED OpenAI adapter output/absence/error tests using a fake client.
-- [ ] T043 GREEN server-only `src/lib/guard/openai-compiler.server.ts`, env selection, and fallback labeling; commit `feat: add optional GPT intent compiler`.
-- [ ] T044 If T037 fails, document the disabled adapter boundary and keep all offline/route tests green instead of implementing T042-T043.
+- [x] T037 Verify official OpenAI SDK/Responses structured-output shape and record the source/date; do not code an unverified call.
+- [x] T038 RED seeded compiler tests in `tests/unit/guard/compiler.test.ts`.
+- [x] T039 GREEN `src/lib/guard/compiler.ts` and `src/lib/guard/deterministic-compiler.ts`; commit `feat: add offline intent compiler`.
+- [x] T040 RED strict request/response tests for `POST /api/compile`, `/api/approve`, and `/api/evaluate`.
+- [x] T041 GREEN Zod-validated handlers under `src/app/api/`; ensure no CORS and no external action; commit `feat: expose validated guard routes`.
+- [x] T042 If and only if T037 succeeds, RED OpenAI adapter output/absence/error tests using a fake client.
+- [x] T043 GREEN server-only `src/lib/guard/openai-compiler.server.ts`, env selection, and fallback labeling; commit `feat: add optional GPT intent compiler`.
+  - Review remediation: enforce the boundary with exact `server-only@0.0.1`, a top-level marker import, a Vitest-only empty alias, and an architecture source test.
+- [x] T044 Not applicable because T037 succeeded; the verified adapter was implemented under T042-T043 instead of being disabled.
 
 ## Phase 7 — Mission-control UI
 
