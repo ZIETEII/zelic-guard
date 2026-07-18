@@ -11,14 +11,10 @@ import { fingerprintContract } from "./fingerprint";
 import type { ExecutionHistorySnapshot } from "./history";
 import type { ExecutionAttempt, IntentContract } from "./types";
 
-export const SIMULATION_DISCLOSURE =
-  "Simulation only — no email or payment is sent.";
+export { INVOICE_INTENT, SIMULATION_DISCLOSURE } from "./demo-seed";
 
 export const FIXTURE_RUNTIME_BOUNDARY =
   "server-only: imports node:crypto through fingerprint.ts; never import from a Client Component";
-
-export const INVOICE_INTENT =
-  "Send invoice INV-2048 to finance@northstar.test once, for no more than $0.25, before 18:00.";
 
 const RESOURCE_FINGERPRINT = `sha256:${"a".repeat(64)}`;
 const PLACEHOLDER_FINGERPRINT = `sha256:${"b".repeat(64)}`;
