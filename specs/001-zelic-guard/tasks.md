@@ -68,13 +68,13 @@
 
 ## Phase 7 — Mission-control UI
 
-- [ ] T045 RED core UI flow test in `tests/integration/ui/mission-control.test.tsx`: compile -> edit/review -> approve -> allow -> recipient denial.
-- [ ] T046 GREEN functional `src/components/guard/mission-control.tsx` and stage components with accessible labels/status.
-- [ ] T047 RED replay, cost, expiry, reset, counters, JSON, and audit assertions.
-- [ ] T048 GREEN all scenario controls and state transitions; commit `feat: build guard execution lab`.
-- [ ] T049 Implement graphite/ivory/signal visual system in `src/app/globals.css` and components, preserving semantic status beyond color.
-- [ ] T050 Add initial/loading/error/proposed/approved/allowed/denied/expired/reset presentations.
-- [ ] T051 Add desktop three-column and mobile stacked layouts, focus-visible states, keyboard flow, and reduced-motion CSS; commit `style: refine accessible mission control`.
+- [x] T045 RED core UI flow test in `tests/integration/ui/mission-control.test.tsx`: compile -> edit/review -> approve -> allow -> recipient denial.
+- [x] T046 GREEN functional `src/components/guard/mission-control.tsx` and stage components with accessible labels/status.
+- [x] T047 RED replay, cost, expiry, reset, counters, JSON, and audit assertions.
+- [x] T048 GREEN all scenario controls and state transitions; commit `feat: build guard execution lab`.
+- [x] T049 Implement graphite/ivory/signal visual system in `src/app/globals.css` and components, preserving semantic status beyond color.
+- [x] T050 Add initial/loading/error/proposed/approved/allowed/denied/expired/reset presentations.
+- [x] T051 Add desktop three-column and mobile stacked layouts, focus-visible states, keyboard flow, and reduced-motion CSS; commit `style: refine accessible mission control`.
 
 ## Phase 8 — Browser coverage and security
 

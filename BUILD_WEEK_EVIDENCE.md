@@ -533,3 +533,76 @@ git ls-files --others --exclude-standard
 ```
 
 Observed at 12:51: exit 0. Diff whitespace and secret scans were clean, npm reported only exact `server-only@0.0.1` at depth zero, and the additional remediation inventory is limited to the package manifests, `vitest.config.ts`, the test-only stub, the architecture test, task evidence, the marker import, and this evidence update. No UI, security-header, deployment, or release-document work was added.
+
+## Phase 7 — Mission-control UI
+
+### T045-T046 core state-machine flow
+
+Focused command:
+
+```bash
+npm run test:run -- tests/integration/ui/mission-control.test.tsx
+```
+
+- **RED:** 2026-07-18 13:11 America/Bogota, exit 1 before collection because `@/components/guard/mission-control` did not exist.
+- **GREEN:** 13:13, exit 0 with 1 file and 1 test passed. The full suite then passed 15 files and 94 tests.
+- **REFACTOR:** the client orchestrator retained state/API ownership while contract inspection, execution evidence, audit timeline, and the original inline-SVG brand mark moved into focused presentational components. The focused flow remained green.
+
+The test proves the editable seeded intent starts with approval and scenarios locked, compilation produces a visible proposed contract, approval unlocks execution, Safe run displays ALLOW plus `ALL_RULES_PASSED`, and Recipient drift displays DENY plus `RECIPIENT_NOT_ALLOWED`. Every network boundary is mocked as strict JSON and the exact simulation disclosure remains visible.
+
+### T047-T048 scenarios, evidence, reset, and errors
+
+Focused command:
+
+```bash
+npm run test:run -- tests/integration/ui/mission-control.test.tsx
+```
+
+- **Harness correction:** the first 13:13 run exposed missing explicit RTL cleanup between Vitest cases; cleanup was added before assessing behavior.
+- **RED:** 13:14, exit 1 with 1 failed and 2 passed because the expired evaluation had no explicit `Expired window` presentation.
+- **GREEN:** 13:14, exit 0 with 1 file and 3 tests passed after adding expiry state and deterministic `AUD-0001` ordering.
+- **REFACTOR:** visible per-check reason codes required reason assertions to target one-or-more matching evidence elements. At 13:20 the focused tests, lint, and typecheck were clean; the full suite passed 15 files and 96 tests.
+
+The expanded tests prove Cost overrun, Replay, and Expired contract reason visibility; Replay shows both `MAX_RUNS_EXCEEDED` and `REPLAY_DETECTED`; every result displays all 10 ordered checks with Pass/Fail text; counters update; approved authority JSON is collapsible; compiled/approved/denied/expired/reset audit events use deterministic IDs and timestamps; reset restores locked pristine state; API failures are announced without consuming state; and the UI never claims email, payment, or delivery occurred.
+
+### T049-T051 visual, responsive, and accessibility system
+
+The final component system uses the specified `#08090a` canvas, `#0f1011` panels, whisper-white borders, Geist/Geist Mono typography, violet/cyan authority signals, emerald only for ALLOW/pass, and coral-red only for DENY/fail. It includes the compact header and hero, proof chips, three-step workflow rail, dense two-column desktop workspace, stacked mobile panels, initial/loading/error/proposed/approved/allowed/denied/expired/reset states, 44px controls, visible focus, semantic labels/headings, `aria-live`, non-color icons/text, and reduced-motion CSS. `page.tsx` remains a Server Component wrapper around the focused client lab.
+
+`src/lib/guard/demo-seed.ts` contains only client-safe constants, type-only imports, and scenario DTO construction. The Client Component imports neither server-only fixtures, `fingerprint.ts`, `node:crypto`, nor the OpenAI adapter. Existing fixture tests continue to consume re-exported shared intent/disclosure constants.
+
+## Phase 7 final verification
+
+Commands:
+
+```bash
+npm run test:run -- tests/integration/ui/mission-control.test.tsx
+npm run test:run
+npm run lint
+npm run typecheck
+npm run build
+```
+
+Observed 2026-07-18 at 13:20-13:22 America/Bogota: focused UI tests passed 3/3; full Vitest passed 15 files and 96 tests; ESLint and `tsc --noEmit` produced clean output; normal Next.js 16.2.10 Turbopack build exited 0, completed TypeScript and 7/7 page generation, and emitted `/` plus the three dynamic API routes.
+
+Real-browser verification used the actual development routes at desktop 1440×1000 and mobile 375×812. Desktop compile -> approve -> Safe run completed with HTTP 200 responses and a visible ALLOW. Both viewports had non-empty semantic content, no Next.js error overlay, no console warnings/errors, and `scrollWidth === innerWidth`. At 375px the shell was 375px and every major panel measured 351px from x=12 to x=363, proving no horizontal page overflow. No Playwright dependency or test suite was added.
+
+Final `git diff --check`, secret-pattern, external-action, CORS, and client-boundary scans exited 0 at 13:24. New UI/client-safe files contain no secret-shaped value, `NEXT_PUBLIC_OPENAI` name, external URL/action primitive, file mutation, CORS opt-in, fixture/fingerprint/OpenAI-adapter import, `node:crypto`, or `server-only` import. The changed/untracked inventory is limited to the Phase 7 page/layout/styles, guard UI components, client-safe demo seed, fixture constant reuse, UI test, task checklist, and this evidence file; no Playwright, security-header, release, or deployment file changed.
+
+## Intended Phase 7 commits
+
+- `test: cover mission-control state transitions`
+- `feat: build guard execution lab`
+- `style: refine accessible mission control`
+
+No commit was attempted because `.git` is read-only in this sandbox and the user explicitly prohibited commit attempts.
+
+## Phase 7 presentation corrections
+
+Focused command: `npm run test:run -- tests/integration/ui/mission-control.test.tsx`.
+
+- **RED:** 2026-07-18 13:53 America/Bogota, exit 1 with 2 failed and 2 passed. The ALLOW view had no `PASS` row markers and the resettable audit still exposed `IMMUTABLE EVIDENCE`.
+- **GREEN:** 13:53, exit 0 with 1 file and 4 tests passed. All ten passing checks render `PASS` without failure reason codes, the failed recipient rule retains `RECIPIENT_NOT_ALLOWED`, and the audit kicker reads `DETERMINISTIC EVIDENCE`.
+- **REFACTOR:** no broader refactor was needed; the production change is limited to the two requested conditional/text render corrections.
+
+Final verification at 13:53-13:54: `npm run test:run` passed 15 files and 97 tests; `npm run lint` and `npm run typecheck` exited 0 with clean output. The first normal `npm run build` attempt failed only while fetching Geist from Google Fonts; an unchanged retry exited 0, compiled successfully, completed TypeScript and 7/7 static pages, and emitted the existing application and three API routes. Final `git diff --check` exited 0.
