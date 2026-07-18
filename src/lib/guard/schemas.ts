@@ -83,3 +83,29 @@ export const executionAttemptSchema = z.strictObject({
     cost: boundedCostSchema,
     requestedAt: zonedDateTimeSchema,
   });
+
+export const ruleIdSchema = z.enum([
+  "contract_approved",
+  "contract_not_expired",
+  "action_matches",
+  "channel_matches",
+  "target_matches",
+  "recipient_allowed",
+  "resource_matches",
+  "cost_within_limit",
+  "runs_available",
+  "execution_not_replayed",
+]);
+
+export const ruleCheckSchema = z.strictObject({
+  rule: ruleIdSchema,
+  passed: z.boolean(),
+  reasonCode: reasonCodeSchema,
+  message: z.string().min(1).max(240),
+});
+
+export const executionVerdictSchema = z.strictObject({
+  verdict: z.enum(["ALLOW", "DENY"]),
+  reasonCodes: z.array(reasonCodeSchema).min(1),
+  checks: z.array(ruleCheckSchema).length(10),
+});

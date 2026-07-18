@@ -25,25 +25,25 @@
 
 ## Phase 3 — Stable contract identity
 
-- [ ] T015 RED object-key-order fingerprint test in `tests/unit/guard/fingerprint.test.ts`.
-- [ ] T016 GREEN recursive JSON canonicalization in `src/lib/guard/canonicalize.ts`.
-- [ ] T017 RED fingerprint exclusion and mutation tests.
-- [ ] T018 GREEN SHA-256 contract fingerprint in `src/lib/guard/fingerprint.ts`.
-- [ ] T019 REFACTOR authority-payload helper; run focused/full suite; commit `feat: add deterministic contract fingerprints`.
+- [x] T015 RED object-key-order fingerprint test in `tests/unit/guard/fingerprint.test.ts`.
+- [x] T016 GREEN recursive JSON canonicalization in `src/lib/guard/canonicalize.ts`.
+- [x] T017 RED fingerprint exclusion and mutation tests.
+- [x] T018 GREEN SHA-256 contract fingerprint in `src/lib/guard/fingerprint.ts`.
+- [x] T019 REFACTOR authority-payload helper; run focused/full suite; intended commit `feat: add deterministic contract fingerprints` deferred because `.git` is read-only.
 
 ## Phase 4 — Policy engine vertical slices
 
-- [ ] T020 RED valid approved execution test in `tests/unit/guard/evaluate-execution.test.ts`.
-- [ ] T021 GREEN ordered checks and `ALLOW` aggregate in `src/lib/guard/evaluate-execution.ts`; commit after focused/full green.
-- [ ] T022 RED proposed/rejected/expired matrix, then GREEN approval and expiry rules; commit `feat: enforce contract lifecycle`.
-- [ ] T023 RED action/channel/target mismatches, then GREEN exact scope rules; commit `feat: enforce action scope`.
-- [ ] T024 RED recipient drift, then GREEN normalized exact allowlist rule; commit `feat: enforce recipient scope`.
-- [ ] T025 RED resource fingerprint drift, then GREEN resource rule; commit `feat: enforce resource identity`.
-- [ ] T026 RED cost overrun/equality boundary, then GREEN cost rule; commit `feat: enforce execution cost`.
-- [ ] T027 RED max-runs behavior, then GREEN injected successful-run count; commit `feat: enforce run allowance`.
-- [ ] T028 RED reused execution ID, then GREEN injected replay lookup; commit `feat: block execution replay`.
-- [ ] T029 RED multiple simultaneous failures and fixed order, then GREEN all-check evaluation without early-return hiding.
-- [ ] T030 REFACTOR shared check constructors while green; commit `refactor: stabilize guard evidence`.
+- [x] T020 RED valid approved execution test in `tests/unit/guard/evaluate-execution.test.ts`.
+- [x] T021 GREEN ordered checks and `ALLOW` aggregate in `src/lib/guard/evaluate-execution.ts`; intended commit recorded after focused/full green.
+- [x] T022 RED proposed/rejected/expired matrix, then GREEN approval and expiry rules; intended commit `feat: enforce contract lifecycle`.
+- [x] T023 RED action/channel/target mismatches, then GREEN exact scope rules; intended commit `feat: enforce action scope`.
+- [x] T024 RED recipient drift, then GREEN normalized exact allowlist rule; intended commit `feat: enforce recipient scope`.
+- [x] T025 RED resource fingerprint drift, then GREEN resource rule; intended commit `feat: enforce resource identity`.
+- [x] T026 RED cost overrun/equality boundary, then GREEN cost rule; intended commit `feat: enforce execution cost`.
+- [x] T027 RED max-runs behavior, then GREEN injected successful-run count; intended commit `feat: enforce run allowance`.
+- [x] T028 RED reused execution ID, then GREEN injected replay lookup; intended commit `feat: block execution replay`.
+- [x] T029 RED multiple simultaneous failures and fixed order, then GREEN all-check evaluation without early-return hiding.
+- [x] T030 REFACTOR shared check constructors while green; intended commit `refactor: stabilize guard evidence` deferred because `.git` is read-only.
 
 ## Phase 5 — Approval, history, fixtures, and audit
 
