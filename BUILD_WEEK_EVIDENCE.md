@@ -5,7 +5,7 @@
 - Primary Codex session ID: `019f75e8-0ba6-71c2-995d-fd75382cfb1b`
 - Model: `gpt-5.6-sol`
 - Build date: 2026-07-18
-- Current authorized scope: completed Phase 2 plus Phase 3 T015-T019 and Phase 4 T020-T030 only
+- Current authorized scope: completed Phases 2-4 plus Phase 5 T031-T036 only
 
 ## Pre-session baseline
 
@@ -17,6 +17,8 @@ The primary implementation session began after these commits already existed:
 | `b90e92b` | `docs: define ZELIC Guard Build Week brief` | Engineering brief only; no product implementation. |
 | `abc152c` | `docs: add ZELIC Guard Spec Kit plan` | Reviewed Phase 1 planning documents and `AGENTS.md`; approved before Phase 2. |
 | `07016fb` | `test: establish guard schema contract` | Independently verified Phase 2 harness, schemas, inferred types, reason codes, and evidence. |
+| `b56c136` | `feat: add deterministic contract fingerprints` | Independently verified Phase 3 canonical serialization and contract identity. |
+| `f055419` | `feat: add deterministic guard policy engine` | Independently verified Phase 4 pure evaluator and fixed policy rules; clean Phase 5 baseline. |
 
 Git history is preserved. This sandbox exposes `.git` as read-only, so the session records intended commit messages but does not attempt commits.
 
@@ -241,6 +243,133 @@ npm run build
 
 Observed: exit 0 on 2026-07-18 after 8.8 seconds. Next.js 16.2.10 compiled successfully, completed TypeScript validation, generated 4/4 static pages, and reported `/` plus `/_not-found` as static routes.
 
+## Phase 5 — Approval, history, audit, and fixtures
+
+Every focused GREEN was followed by the exact full-suite command:
+
+```bash
+npm run test:run
+```
+
+### T031-T032 approval
+
+Focused command:
+
+```bash
+npm run test:run -- tests/unit/guard/approve-contract.test.ts
+```
+
+- **RED:** 2026-07-18 11:58 America/Bogota, exit 1 because `@/lib/guard/approve-contract` did not exist.
+- **GREEN:** 11:58, exit 0 with 6/6 focused tests; full suite exit 0 with 54/54 tests.
+- **REFACTOR:** approvable-snapshot validation was extracted while green; 6/6 focused and 54/54 full remained green at 11:58.
+
+The approval function strictly parses input, accepts only `proposed`, verifies the stored fingerprint against the authority payload, returns a new `approved` copy, and leaves the input unchanged. Invalid lifecycle transitions, malformed input, and stale fingerprints throw before approval.
+
+### T033-T034 isolated demo history
+
+Focused command:
+
+```bash
+npm run test:run -- tests/unit/guard/history.test.ts
+```
+
+- **RED:** 2026-07-18 11:59 America/Bogota, exit 1 because `@/lib/guard/history` did not exist.
+- **GREEN:** 11:59, exit 0 with 6/6 focused tests; at 12:00 the full suite passed 60/60.
+- **REFACTOR:** snapshot validation was centralized in the shared schema and reused by the pure evaluator; 6/6 focused and 60/60 full remained green at 12:00.
+- **Verdict-integrity RED:** 12:04, exit 1 with 1 failed and 6 passed because a forged `ALLOW` containing failed checks did not throw.
+- **Verdict-integrity GREEN:** 12:04, exit 0 with 7/7 focused tests and 75/75 full tests.
+
+Each `InMemoryExecutionHistory` instance owns an isolated Set and counter. Snapshots are defensive copies. `recordVerdict` validates the full verdict aggregate and execution ID before mutation, ignores valid `DENY`, records a unique ID and increments exactly once after consistent `ALLOW`, and rejects duplicate or forged allowance. Evaluation schema/integrity exceptions never reach the mutation step. `evaluateExecution` remains pure.
+
+### T035 deterministic audit events
+
+Focused command:
+
+```bash
+npm run test:run -- tests/unit/guard/audit.test.ts
+```
+
+- **RED:** 2026-07-18 12:00 America/Bogota, exit 1 because `@/lib/guard/audit` did not exist.
+- **GREEN:** 12:01, exit 0 with 6/6 focused tests; full suite exit 0 with 66/66 tests.
+- **REFACTOR:** deterministic event-ID formatting was extracted while green; 6/6 focused and 66/66 full remained green at 12:01.
+
+Audit construction accepts strict caller-supplied sequence, timestamp, kind, summary, reason codes, and optional IDs. It derives only `schemaVersion` and the padded event ID. Tests replace `Date.now` and `Math.random` with throwing spies, proving neither is consulted.
+
+### T036 deterministic invoice simulations
+
+Focused command:
+
+```bash
+npm run test:run -- tests/unit/guard/fixtures.test.ts
+```
+
+- **RED:** 2026-07-18 12:02 America/Bogota, exit 1 because `@/lib/guard/fixtures` did not exist.
+- **GREEN:** 12:03, exit 0 with 8/8 focused tests; full suite exit 0 with 74/74 tests.
+- **REFACTOR:** history snapshot copying was centralized while green; 8/8 focused and 74/74 full remained green at 12:03.
+
+The factory returns fresh deterministic proposed/approved invoice contracts and scenarios for valid ALLOW, recipient drift, cost overrun, replay, and expiry. Replay intentionally reports both max-run exhaustion and replay detection because the one-run contract already has a consumed successful execution. The module declares a server-only boundary because fingerprint creation imports `node:crypto`; future Client Components must receive serialized DTOs and must not import `fixtures.ts`. All scenarios display the simulation disclosure and perform no email, payment, network request, or external mutation.
+
+## Intended Phase 5 commits
+
+- `feat: enforce contract approval integrity`
+- `feat: add isolated execution history`
+- `feat: add deterministic audit events`
+- `feat: add deterministic guard lab state`
+
+No commit was attempted because `.git` is read-only in this sandbox and the user explicitly prohibited commit attempts.
+
+## Phase 5 final verification
+
+Focused approval:
+
+```bash
+npm run test:run -- tests/unit/guard/approve-contract.test.ts
+```
+
+Observed: exit 0 on 2026-07-18 at 12:05 America/Bogota; 1 file and 6 tests passed.
+
+Focused history:
+
+```bash
+npm run test:run -- tests/unit/guard/history.test.ts
+```
+
+Observed: exit 0 at 12:05; 1 file and 7 tests passed.
+
+Focused audit:
+
+```bash
+npm run test:run -- tests/unit/guard/audit.test.ts
+```
+
+Observed: exit 0 at 12:05; 1 file and 6 tests passed.
+
+Focused fixtures:
+
+```bash
+npm run test:run -- tests/unit/guard/fixtures.test.ts
+```
+
+Observed: exit 0 at 12:05; 1 file and 8 tests passed.
+
+Full suite:
+
+```bash
+npm run test:run
+```
+
+Observed: exit 0 at 12:05; 8 files and 75 tests passed.
+
+Quality gates:
+
+```bash
+npm run lint
+npm run typecheck
+npm run build
+```
+
+Observed: all exited 0. ESLint and `tsc --noEmit` produced clean output. Next.js 16.2.10 compiled successfully, completed TypeScript validation, generated 4/4 static pages, and reported `/` plus `/_not-found` as static routes.
+
 ## Scope boundary
 
-Completed scope now includes the Phase 2 harness/schemas, Phase 3 canonical identity, and Phase 4 pure policy evaluation only. It does not implement approval behavior, mutable history, fixtures, audit events, compiler adapters, routes, UI, or any external action.
+Completed scope now includes the Phase 2 harness/schemas, Phase 3 canonical identity, Phase 4 pure policy evaluation, and Phase 5 approval/history/audit/fixtures. It does not implement a compiler, routes, UI, browser coverage, release documentation, or any external action.

@@ -47,12 +47,12 @@
 
 ## Phase 5 — Approval, history, fixtures, and audit
 
-- [ ] T031 RED approval-invalidates-on-edit and bad-fingerprint tests in `tests/unit/guard/approve-contract.test.ts`.
-- [ ] T032 GREEN `src/lib/guard/approve-contract.ts`.
-- [ ] T033 RED allowed-only history consumption tests in `tests/unit/guard/history.test.ts`.
-- [ ] T034 GREEN `src/lib/guard/history.ts` interface and demo adapter/snapshot implementation.
-- [ ] T035 RED deterministic audit sequence/timestamp tests, then GREEN `src/lib/guard/audit.ts`.
-- [ ] T036 Add and test invoice/adversarial fixtures in `src/lib/guard/fixtures.ts`; commit `feat: add deterministic guard lab state`.
+- [x] T031 RED approval-invalidates-on-edit and bad-fingerprint tests in `tests/unit/guard/approve-contract.test.ts`.
+- [x] T032 GREEN `src/lib/guard/approve-contract.ts`; intended commit `feat: enforce contract approval integrity` deferred because `.git` is read-only.
+- [x] T033 RED allowed-only history consumption tests in `tests/unit/guard/history.test.ts`.
+- [x] T034 GREEN `src/lib/guard/history.ts` interface and demo adapter/snapshot implementation; intended commit `feat: add isolated execution history` deferred.
+- [x] T035 RED deterministic audit sequence/timestamp tests, then GREEN `src/lib/guard/audit.ts`; intended commit `feat: add deterministic audit events` deferred.
+- [x] T036 Add and test invoice/adversarial fixtures in `src/lib/guard/fixtures.ts`; intended commit `feat: add deterministic guard lab state` deferred.
 
 ## Phase 6 — Intent compiler and server routes
 
