@@ -16,7 +16,7 @@ const ENDPOINTS = [
 const QUICKSTART = `curl -X POST \\
   https://zelic-guard-build-week.vercel.app/api/compile \\
   -H 'content-type: application/json' \\
-  -d '{"intent":"Send invoice INV-2048…","mode":"auto"}'`;
+  -d '{"intent":"Send invoice INV-2048 to finance@northstar.test once, for no more than $0.25, before 18:00.","mode":"auto"}'`;
 
 export function DeveloperQuickstart() {
   return (

@@ -1478,6 +1478,34 @@ button:disabled {
     flex-direction: column;
   }
 
+  .suite-report ol {
+    grid-template-columns: 1fr;
+    overflow-x: visible;
+  }
+
+  .suite-report li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .suite-report li:last-child {
+    border-bottom: 0;
+  }
+
+  .suite-report li code {
+    grid-column: 1 / -1;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .suite-report li b {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
   .developer-heading {
     align-items: flex-start;
     flex-direction: column;

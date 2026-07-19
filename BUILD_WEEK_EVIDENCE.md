@@ -606,3 +606,124 @@ Focused command: `npm run test:run -- tests/integration/ui/mission-control.test.
 - **REFACTOR:** no broader refactor was needed; the production change is limited to the two requested conditional/text render corrections.
 
 Final verification at 13:53-13:54: `npm run test:run` passed 15 files and 97 tests; `npm run lint` and `npm run typecheck` exited 0 with clean output. The first normal `npm run build` attempt failed only while fetching Geist from Google Fonts; an unchanged retry exited 0, compiled successfully, completed TypeScript and 7/7 static pages, and emitted the existing application and three API routes. Final `git diff --check` exited 0.
+
+## Phase 8 — Competitive judge experience and release hardening
+
+### Official criteria review
+
+On 2026-07-18, immediately before Phase 8, the official OpenAI Build Week overview and rules were reviewed. The submission was evaluated against the published criteria: technological implementation, coherent product design, credible impact, and quality/novelty of the idea. The official requirements also emphasize a working project, a public sub-three-minute video with audio explaining Codex and GPT‑5.6, a testable repository, and a no-rebuild judge path for developer tools.
+
+The baseline full suite passed 15 files and 97 tests at 23:26 America/Bogota.
+
+### T052 automatic GPT‑5.6 selection disclosure
+
+Focused command:
+
+```bash
+npm run test:run -- tests/integration/ui/mission-control.test.tsx
+```
+
+- **RED:** 2026-07-18 23:26 America/Bogota, exit 1 with 1 failed and 4 passed. The compile request sent `mode: "deterministic"` instead of the required `mode: "auto"`; the UI could therefore never exercise the existing GPT‑5.6 adapter.
+- **GREEN:** 23:27, exit 0 with 5/5 focused tests. The client now requests automatic provider selection and renders `GPT-5.6 live`, `Deterministic fallback`, or the preflight state from validated server metadata.
+- **Full GREEN:** 23:27, 15 files and 98 tests passed.
+
+No client code reads an API key. Missing credentials and provider failures remain visibly labeled and fall back only through the existing strict provider orchestrator.
+
+### T053 one-click adversarial threat suite
+
+Focused command:
+
+```bash
+npm run test:run -- tests/integration/ui/mission-control.test.tsx
+```
+
+- **RED:** 23:28, exit 1 with 1 failed and 5 passed because the `Run full threat suite` control did not exist.
+- **GREEN:** 23:29, exit 0 with 6/6 focused tests. The suite executes all five fixtures through the real `/api/evaluate` route, threads only validated successful history into subsequent calls, and presents one ALLOW plus four DENY outcomes.
+- **Full GREEN:** 23:29, 15 files and 99 tests passed.
+
+The suite displays progressive results, per-scenario first reason, final counters, and deterministic audit entries. It makes no external action. Normal commit `6006a11` records this cycle without rewriting prior history.
+
+### T054 developer integration path
+
+Focused command:
+
+```bash
+npm run test:run -- tests/integration/ui/mission-control.test.tsx
+```
+
+- **RED:** 23:30, exit 1 with 1 failed and 6 passed because the public judge sandbox and three-route integration path were absent.
+- **GREEN:** 23:31, exit 0 with 7/7 focused tests. The product now identifies the public sandbox, shows compile/approve/evaluate as the integration surface, links the public source, and includes a live curl quickstart.
+- **Full GREEN:** 23:31, 15 files and 100 tests passed.
+- **React review:** component structure, hooks, semantic controls, stable list keys, client/server boundaries, and TypeScript patterns were reviewed. `npm run lint` and `npm run typecheck` both exited 0 at 23:32.
+
+Normal commit `e75774e` records this cycle.
+
+### T055 browser security headers
+
+Focused command:
+
+```bash
+npm run test:run -- tests/architecture/security-headers.test.ts
+```
+
+- **RED:** 23:33, exit 1 because `nextConfig.headers` was undefined.
+- **GREEN:** 23:33, exit 0 with 1/1 focused test. The global rule now includes a same-origin CSP with explicit `connect-src` and `frame-ancestors`, plus MIME sniffing, frame, referrer, and permissions protections.
+- **Full GREEN:** 23:33, 16 files and 101 tests passed.
+
+The implementation follows the installed Next.js 16.2.10 `next.config` headers and CSP guides. Development alone permits `unsafe-eval`; production does not.
+
+### Release documentation
+
+The scaffold README was replaced with the problem, differentiation, architecture, policy matrix, live judge path, API surface, setup, scripts, supported runtime, Codex/GPT‑5.6 evidence, security boundaries, and provenance. `PRIOR_WORK.md`, `LICENSE`, `.env.example`, `docs/DEMO_SCRIPT.md`, `docs/JUDGE_TEST_PLAN.md`, and `docs/SECURITY.md` were added. The WAF section documents a conservative `/api/compile` rate-limit control without silently enabling a billed service.
+
+The public sandbox intentionally remains account-free and database-free. This is not an unfinished authentication path: the demo stores no user data, the governing constitution requires credential-free judgeability, and forcing account creation would add evaluation friction without proving the runtime authority mechanism. Production replay persistence remains an adapter boundary rather than hidden state inside the pure engine.
+
+### T056 PostCSS advisory remediation
+
+Current `npm audit --json` was run against the registry on 2026-07-18 at 23:37 America/Bogota. It reported two moderate entries and no high or critical findings. Both entries resolved to `next@16.2.10 → postcss@8.4.31` and advisory `GHSA-qx2v-qp2m-jg93`, fixed in PostCSS 8.5.10.
+
+Focused command:
+
+```bash
+npm run test:run -- tests/architecture/dependency-security.test.ts
+```
+
+- **RED:** 23:38, exit 1 because Next.js resolved PostCSS `8.4.31` (`80431 < 80510`).
+- **Compatibility check:** the repository already used PostCSS `8.5.19` through Tailwind and Vite. The fix remains within PostCSS major 8. A first nested override was rejected by npm as invalid and did not alter the resolved package; it was replaced before GREEN.
+- **GREEN:** 23:39, exit 0 after a root npm override deduplicated Next.js, Tailwind, and Vite onto PostCSS `8.5.19`.
+
+`npm install` then reported 456 audited packages and zero vulnerabilities. `npm ls postcss --all` showed only PostCSS `8.5.19`, including the Next.js resolution. The architecture test resolves PostCSS from Next.js's own module context and requires at least `8.5.10`, preventing lockfile regression.
+
+### T057 mobile threat-suite legibility
+
+The real-browser mobile pass exposed a presentation defect that unit tests could not reveal: the five verdict cells used a horizontally scrolling five-column grid at 390px, leaving the last result clipped in the judge-facing viewport.
+
+Focused command:
+
+```bash
+npm run test:run -- tests/architecture/mobile-threat-suite.test.ts
+```
+
+- **RED:** 23:46, exit 1 because the 760px media query did not provide a single-column suite report or readable wrapped reason codes.
+- **GREEN:** 23:46, exit 0 with 1/1 focused test after stacking the results as five explicit rows, removing horizontal scrolling, and allowing reason codes to wrap.
+- **REFACTOR:** the first test draft referenced a nonexistent 680px breakpoint; it was corrected to the actual 760px breakpoint and rerun RED before production CSS changed. A subsequent TypeScript compatibility correction removed unnecessary regular-expression dot-all flags without weakening the assertions.
+
+Browser re-verification at 390×844 showed computed `grid-template-columns: 330px`, `overflow-x: visible`, five rendered result rows, `scrollWidth === innerWidth === 390`, and no console warnings or errors.
+
+## Phase 8 final verification
+
+The exact final working tree passed:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:run
+npm run build
+npm audit --json
+```
+
+Observed 2026-07-18 at 23:47–23:49 America/Bogota: ESLint and TypeScript were clean; Vitest passed 18 files and 103 tests; Next.js 16.2.10 produced an optimized Turbopack build, completed TypeScript and 7/7 static pages, and emitted `/` plus all three dynamic API routes; npm reported 0 total vulnerabilities at every severity.
+
+Real-browser desktop verification at 1440×960 completed compile → approve → full threat suite through the actual local Route Handlers. The final report contained `ALL_RULES_PASSED`/ALLOW plus four specific DENY reason codes, counters read `Allowed 1 · Blocked 4`, the audit contained seven deterministic events, page `scrollWidth` exactly matched 1440px, and the console had no warnings or errors.
+
+The same complete flow passed at 390×844 after the responsive correction. The final mobile report displayed all five outcomes as readable rows, had no page overflow, and produced no console warnings or errors. Release screenshots are stored under `docs/assets/` for repository and submission use.
