@@ -51,6 +51,7 @@ body {
 }
 
 button,
+input,
 textarea,
 summary {
   font: inherit;
@@ -62,6 +63,7 @@ summary {
 }
 
 button:focus-visible,
+input:focus-visible,
 textarea:focus-visible,
 summary:focus-visible {
   outline: 2px solid var(--focus);
@@ -178,6 +180,8 @@ button:disabled {
 }
 
 .reset-button,
+.session-button,
+.operator-login-link,
 .button-primary,
 .button-authority,
 .button-secondary {
@@ -198,6 +202,66 @@ button:disabled {
   min-height: 38px;
   padding: 0 13px;
   background: rgba(255, 255, 255, 0.035);
+}
+
+.operator-login-link,
+.session-button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  padding: 0 12px;
+  background: rgba(99, 216, 255, 0.055);
+  color: #c8eefb;
+  font-size: 11px;
+  font-weight: 620;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.session-button {
+  gap: 6px;
+  cursor: pointer;
+}
+
+.session-action {
+  position: relative;
+  display: inline-flex;
+}
+
+.session-error {
+  position: absolute;
+  z-index: 8;
+  top: calc(100% + 8px);
+  right: 0;
+  width: max-content;
+  max-width: min(260px, 80vw);
+  border: 1px solid rgba(255, 115, 118, 0.32);
+  border-radius: 7px;
+  padding: 8px 10px;
+  background: #181011;
+  color: #ffb4b6;
+  font: 10px/1.4 "Geist Mono", monospace;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.36);
+}
+
+.operator-login-link:hover,
+.session-button:hover:not(:disabled) {
+  border-color: rgba(99, 216, 255, 0.38);
+  background: rgba(99, 216, 255, 0.1);
+}
+
+.operator-badge {
+  border-color: rgba(53, 208, 127, 0.28);
+  color: #a9eec9;
+}
+
+.operator-identity {
+  color: var(--muted);
+  font: 10px "Geist Mono", monospace;
+  white-space: nowrap;
 }
 
 .reset-button svg,
@@ -1345,6 +1409,259 @@ button:disabled {
   white-space: pre;
 }
 
+.login-shell {
+  width: min(100%, 1320px);
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  margin: 0 auto;
+  padding: 0 28px 28px;
+}
+
+.login-topbar {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.login-brand > span {
+  display: grid;
+  gap: 1px;
+}
+
+.login-brand strong {
+  font-size: 15px;
+}
+
+.login-brand small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.login-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
+  align-items: center;
+  gap: clamp(48px, 8vw, 118px);
+  padding: 76px 3vw;
+}
+
+.login-story {
+  min-width: 0;
+}
+
+.login-story h1 {
+  max-width: 760px;
+  margin: 18px 0 22px;
+  color: var(--ink);
+  font-size: clamp(54px, 6vw, 88px);
+  font-weight: 620;
+  letter-spacing: -0.065em;
+  line-height: 0.96;
+}
+
+.login-story > p:not(.overline) {
+  max-width: 650px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.login-story ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 44px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  list-style: none;
+}
+
+.login-story li {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+  padding: 18px 15px;
+  border-right: 1px solid var(--border);
+}
+
+.login-story li:first-child {
+  padding-left: 0;
+}
+
+.login-story li:last-child {
+  border-right: 0;
+}
+
+.login-story li strong {
+  color: var(--cyan);
+  font: 10px "Geist Mono", monospace;
+  letter-spacing: 0.07em;
+}
+
+.login-story li span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.login-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  padding: clamp(24px, 3.4vw, 42px);
+  background:
+    linear-gradient(145deg, rgba(99, 216, 255, 0.045), transparent 42%),
+    var(--panel);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+}
+
+.login-card::before {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--allow), transparent 74%);
+  content: "";
+}
+
+.login-card-heading h2 {
+  margin: 10px 0 8px;
+  font-size: 28px;
+  letter-spacing: -0.035em;
+}
+
+.login-card-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.login-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.login-form label {
+  margin-top: 7px;
+  color: #c6c8ce;
+  font-size: 11px;
+  font-weight: 580;
+}
+
+.login-form input {
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  padding: 0 14px;
+  background: #090a0b;
+  color: var(--ink);
+  caret-color: var(--cyan);
+  font-size: 13px;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.login-form input:hover {
+  border-color: rgba(244, 244, 239, 0.26);
+}
+
+.login-submit {
+  margin-top: 12px;
+}
+
+.demo-access-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  border: 1px solid rgba(53, 208, 127, 0.2);
+  border-radius: 10px;
+  padding: 12px;
+  background: rgba(53, 208, 127, 0.04);
+}
+
+.demo-access-box > div {
+  min-width: 0;
+}
+
+.demo-access-box span {
+  color: #9ce4be;
+  font: 8px "Geist Mono", monospace;
+  letter-spacing: 0.07em;
+}
+
+.demo-access-box p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.demo-access-box button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  border: 1px solid rgba(53, 208, 127, 0.3);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: rgba(53, 208, 127, 0.1);
+  color: #b7edcf;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.login-error {
+  margin: 14px 0 0;
+  border: 1px solid rgba(255, 107, 99, 0.28);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 107, 99, 0.07);
+  color: #ffaaa5;
+  font-size: 11px;
+}
+
+.public-sandbox-link {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+  border-radius: 8px;
+  color: #b9bbc2;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.public-sandbox-link:hover {
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--ink);
+}
+
+.login-disclosure {
+  margin: 0;
+  border-top: 1px solid var(--border);
+  padding: 20px 0 0;
+  color: var(--dim);
+  font: 9px/1.6 "Geist Mono", monospace;
+  text-align: center;
+}
+
 .error-banner {
   gap: 9px;
   margin-top: 14px;
@@ -1399,6 +1716,12 @@ button:disabled {
   .scenario-card:first-child {
     grid-column: auto;
   }
+
+  .login-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
+    gap: 44px;
+    padding-inline: 0;
+  }
 }
 
 @media (max-width: 760px) {
@@ -1412,8 +1735,28 @@ button:disabled {
 
   .brand-lockup span,
   .simulation-badge,
-  .judge-badge {
+  .judge-badge,
+  .operator-identity {
     display: none;
+  }
+
+  .login-shell {
+    padding-inline: 16px;
+  }
+
+  .login-layout {
+    grid-template-columns: 1fr;
+    gap: 38px;
+    padding: 48px 0;
+  }
+
+  .login-story h1 {
+    max-width: 600px;
+    font-size: clamp(44px, 13vw, 68px);
+  }
+
+  .login-story > p:not(.overline) {
+    font-size: 14px;
   }
 
   .hero-compact {
@@ -1555,6 +1898,66 @@ button:disabled {
     min-width: 44px;
     padding: 0 11px;
     font-size: 0;
+  }
+
+  .operator-badge {
+    display: none;
+  }
+
+  .operator-login-link {
+    min-width: 58px;
+    padding-inline: 9px;
+    font-size: 9px;
+  }
+
+  .session-button {
+    min-width: 44px;
+    padding: 0 10px;
+    font-size: 0;
+  }
+
+  .session-button span {
+    font-size: 15px;
+  }
+
+  .login-shell {
+    padding-inline: 12px;
+  }
+
+  .login-topbar {
+    min-height: 68px;
+  }
+
+  .login-story h1 {
+    font-size: 42px;
+  }
+
+  .login-story ul {
+    grid-template-columns: 1fr;
+  }
+
+  .login-story li,
+  .login-story li:first-child {
+    padding: 12px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .login-story li:last-child {
+    border-bottom: 0;
+  }
+
+  .login-card {
+    padding: 24px 18px;
+  }
+
+  .demo-access-box {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .demo-access-box button {
+    min-height: 40px;
   }
 
   .reset-button svg {

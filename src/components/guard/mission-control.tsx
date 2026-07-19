@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
+import { LogoutButton } from "@/components/auth/logout-button";
 import { AuditTimeline, type AuditItem } from "./audit-timeline";
 import { BrandMark } from "./brand-mark";
 import { ContractInspector } from "./contract-inspector";
@@ -46,7 +48,15 @@ const AUDIT_TIMESTAMPS = [
   "2026-07-18T17:00:09.000Z",
 ] as const;
 
-export function MissionControl() {
+type MissionAccess =
+  | { readonly kind: "public" }
+  | { readonly kind: "operator"; readonly label: string };
+
+export function MissionControl({
+  access = { kind: "public" },
+}: {
+  readonly access?: MissionAccess;
+}) {
   const [intent, setIntent] = useState(INVOICE_INTENT);
   const [contract, setContract] = useState<IntentContract | null>(null);
   const [compiler, setCompiler] =
@@ -237,7 +247,18 @@ export function MissionControl() {
         </div>
         <div className="header-actions">
           <span className="header-badge">OPENAI BUILD WEEK</span>
-          <span className="header-badge judge-badge">PUBLIC JUDGE SANDBOX</span>
+          {access.kind === "operator" ? (
+            <>
+              <span className="header-badge operator-badge">OPERATOR WORKSPACE</span>
+              <span className="operator-identity">{access.label}</span>
+              <LogoutButton />
+            </>
+          ) : (
+            <>
+              <span className="header-badge judge-badge">PUBLIC JUDGE SANDBOX</span>
+              <Link className="operator-login-link" href="/login">Operator login</Link>
+            </>
+          )}
           <span className="header-badge simulation-badge">
             <span aria-hidden="true" /> SIMULATION
           </span>

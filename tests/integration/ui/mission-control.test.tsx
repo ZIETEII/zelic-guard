@@ -7,6 +7,10 @@ import { evaluateExecution } from "@/lib/guard/evaluate-execution";
 import { createInvoiceScenarioFixtures } from "@/lib/guard/fixtures";
 import { REASON_CODES } from "@/lib/guard/reason-codes";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}));
+
 function jsonResponse(body: unknown, ok = true): Response {
   return {
     ok,
@@ -180,6 +184,10 @@ describe("ZELIC Guard mission control", () => {
     render(<MissionControl />);
 
     expect(screen.getByText("PUBLIC JUDGE SANDBOX")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Operator login" })).toHaveAttribute(
+      "href",
+      "/login",
+    );
     expect(
       screen.getByRole("heading", { name: "Integrate in three requests" }),
     ).toBeInTheDocument();
@@ -190,6 +198,19 @@ describe("ZELIC Guard mission control", () => {
       "href",
       "https://github.com/ZIETEII/zelic-guard",
     );
+  });
+
+  it("labels the authenticated operator workspace and exposes sign out", () => {
+    render(
+      <MissionControl
+        access={{ kind: "operator", label: "Build Week Operator" }}
+      />,
+    );
+
+    expect(screen.getByText("OPERATOR WORKSPACE")).toBeInTheDocument();
+    expect(screen.getByText("Build Week Operator")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
+    expect(screen.queryByText("PUBLIC JUDGE SANDBOX")).not.toBeInTheDocument();
   });
 
   it("shows cost, replay, expiry, counters, JSON, audit order, and pristine reset", async () => {
