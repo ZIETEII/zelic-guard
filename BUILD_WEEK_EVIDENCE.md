@@ -850,3 +850,25 @@ git diff --check
 ```
 
 All commands exited 0. Vitest passed 24 files and 115 tests, the optimized build kept both auth pages dynamic, npm reported 0 vulnerabilities, and the diff whitespace check was clean.
+
+### Production release acceptance
+
+Normal commits `7c4d691` (`feat: add optional operator workspace`) and `e5995c9` (`docs: document operator access`) were pushed to `origin/main` without amending or rewriting history. Vercel production deployment `dpl_6ZgXPVWYtxjh2tub6Uz88axxtzio` built Next.js 16.2.10 successfully, emitted `/login` and `/workspace` as request-time routes, reached `READY`, and assigned the canonical alias `https://zelic-guard-build-week.vercel.app`.
+
+Vercel lists exactly three login variables, all encrypted and scoped only to Production:
+
+- `ZELIC_AUTH_EMAIL`
+- `ZELIC_AUTH_PASSWORD_SCRYPT`
+- `ZELIC_SESSION_SECRET`
+
+The plaintext demo password was never stored in Vercel; only a newly salted scrypt verifier was transmitted. A fresh 48-byte random session secret was piped directly to the environment command and was not printed, written to a file, or committed. No database or external authentication service was provisioned.
+
+The production login response returned HTTP 200 with `Cache-Control: no-store`. Its redacted cookie attributes were independently inspected as:
+
+```text
+Path=/; Max-Age=14400; Secure; HttpOnly; SameSite=strict; Priority=high
+```
+
+Real-browser production acceptance at 1440×960 reproduced the complete public → protected → login → compile → approve → threat suite → logout path. The final authenticated report contained five outcomes, `Allowed 1 · Blocked 4`, and seven audit events with `scrollWidth === innerWidth === 1440`. At 390×844, all five rows and the sign-out control remained visible with `scrollWidth === innerWidth === 390`. Both console scans were empty. After logout, a direct `/workspace` request redirected to `/login` again.
+
+`vercel inspect` confirmed `status Ready`, target `production`, and the canonical alias. A deployment-scoped error-log query for the preceding hour returned no errors after the complete browser exercise.
