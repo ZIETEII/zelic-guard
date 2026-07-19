@@ -872,3 +872,18 @@ Path=/; Max-Age=14400; Secure; HttpOnly; SameSite=strict; Priority=high
 Real-browser production acceptance at 1440×960 reproduced the complete public → protected → login → compile → approve → threat suite → logout path. The final authenticated report contained five outcomes, `Allowed 1 · Blocked 4`, and seven audit events with `scrollWidth === innerWidth === 1440`. At 390×844, all five rows and the sign-out control remained visible with `scrollWidth === innerWidth === 390`. Both console scans were empty. After logout, a direct `/workspace` request redirected to `/login` again.
 
 `vercel inspect` confirmed `status Ready`, target `production`, and the canonical alias. A deployment-scoped error-log query for the preceding hour returned no errors after the complete browser exercise.
+
+### T064 revisable authority parameters and persistent theme
+
+Focused command:
+
+```bash
+npm run test:run -- tests/unit/guard/revise-contract.test.ts tests/integration/api/revise-route.test.ts tests/integration/ui/theme-toggle.test.tsx
+```
+
+- **RED:** 2026-07-19 09:07 America/Bogota, all three collections failed because the revision engine, `/api/revise` boundary, and theme selector did not exist.
+- **GREEN:** the focused files passed 5/5 after adding strict Zod revision input, a freshly fingerprinted proposed snapshot, and a persisted dark/light selector.
+- **Authority invariant:** a revision always returns `PROPOSED`; Mission Control clears verdict, run history, counters, threat-suite results, and selected scenario before a human can approve the new snapshot.
+- **Full GREEN:** `npm run lint`, `npm run typecheck`, `npm run test:run`, and `npm run build` all exited 0. Vitest passed 27 files and 121 tests.
+
+Local real-browser acceptance at 1440×960 compiled and approved the seeded simulation, executed one safe run, then revised the recipient and cost. The application visibly returned to proposed authority, disabled **Safe run**, reset `Allowed 1 · Blocked 0` to `Allowed 0 · Blocked 0`, and recorded `Authority parameters revised`. Switching to light mode persisted the preference, applied `data-theme="light"`, retained contrast, and produced no horizontal overflow. At 390×844, both theme directions, the parameter editor, and the compiled authority remained usable with `scrollWidth === innerWidth === 390`; browser console logs contained no warnings or errors.

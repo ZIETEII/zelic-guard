@@ -40,6 +40,20 @@ function installGuardApiMock(): ReturnType<typeof vi.fn> {
       return jsonResponse({ contract: fixtures.approvedContract });
     }
 
+    if (path === "/api/revise") {
+      return jsonResponse({
+        contract: {
+          ...body.contract,
+          constraints: {
+            ...body.contract.constraints,
+            ...body.patch,
+          },
+          status: "proposed",
+          fingerprint: `sha256:${"c".repeat(64)}`,
+        },
+      });
+    }
+
     if (path === "/api/evaluate") {
       const verdict = evaluateExecution(body);
       return jsonResponse({
@@ -178,6 +192,38 @@ describe("ZELIC Guard mission control", () => {
 
     expect(screen.getByText("DETERMINISTIC EVIDENCE")).toBeInTheDocument();
     expect(screen.queryByText("IMMUTABLE EVIDENCE")).not.toBeInTheDocument();
+  });
+
+  it("reissues edited parameters and clears the previous approval evidence", async () => {
+    const user = userEvent.setup();
+    const fetchMock = installGuardApiMock();
+    render(<MissionControl />);
+
+    await user.click(screen.getByRole("button", { name: "Compile contract" }));
+    await user.click(await screen.findByRole("button", { name: "Approve contract" }));
+    await user.click(await screen.findByRole("button", { name: "Safe run" }));
+    expect(await screen.findByText("Allowed 1 · Blocked 0")).toBeInTheDocument();
+
+    await user.clear(screen.getByLabelText("Authorized recipient"));
+    await user.type(screen.getByLabelText("Authorized recipient"), "ops@northstar.test");
+    await user.clear(screen.getByLabelText("Maximum cost (USD)"));
+    await user.type(screen.getByLabelText("Maximum cost (USD)"), "0.5");
+    await user.click(
+      screen.getByRole("button", { name: "Apply changes & require approval" }),
+    );
+
+    const revisionRequest = fetchMock.mock.calls.find(
+      ([path]) => String(path) === "/api/revise",
+    );
+    expect(JSON.parse(String(revisionRequest?.[1]?.body))).toMatchObject({
+      patch: {
+        allowedRecipients: ["ops@northstar.test"],
+        maxCost: 0.5,
+      },
+    });
+    expect(await screen.findByText("Authority parameters revised")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Safe run" })).toBeDisabled();
+    expect(screen.getByText("Allowed 0 · Blocked 0")).toBeInTheDocument();
   });
 
   it("presents the server API path and public judge sandbox", () => {

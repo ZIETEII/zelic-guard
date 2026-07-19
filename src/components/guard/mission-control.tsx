@@ -7,6 +7,7 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { AuditTimeline, type AuditItem } from "./audit-timeline";
 import { BrandMark } from "./brand-mark";
 import { ContractInspector } from "./contract-inspector";
+import { ContractParameterEditor } from "./contract-parameter-editor";
 import { DeveloperQuickstart } from "./developer-quickstart";
 import {
   ExecutionGate,
@@ -27,8 +28,14 @@ import {
 import {
   approveContractResponseSchema,
   evaluateExecutionResponseSchema,
+  reviseContractResponseSchema,
 } from "@/lib/guard/route-schemas";
-import type { ExecutionVerdict, IntentContract } from "@/lib/guard/types";
+import type {
+  ContractRevisionPatch,
+  ExecutionVerdict,
+  IntentContract,
+} from "@/lib/guard/types";
+import { ThemeToggle } from "./theme-toggle";
 
 const EMPTY_HISTORY: DemoHistorySnapshot = {
   successfulRuns: 0,
@@ -71,7 +78,7 @@ export function MissionControl({
   const [selectedScenario, setSelectedScenario] =
     useState<ScenarioId | null>(null);
   const [busy, setBusy] =
-    useState<"compile" | "approve" | "evaluate" | "suite" | null>(null);
+    useState<"compile" | "approve" | "revise" | "evaluate" | "suite" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const approved = contract?.status === "approved";
@@ -115,6 +122,30 @@ export function MissionControl({
       appendAudit("Contract approved", "neutral");
     } catch {
       setError("Contract approval failed. Recompile a valid proposed contract.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function reviseCurrentContract(patch: ContractRevisionPatch) {
+    if (!contract) return;
+    setBusy("revise");
+    setError(null);
+
+    try {
+      const payload = reviseContractResponseSchema.parse(
+        await postJson("/api/revise", { contract, patch }),
+      );
+      setContract(payload.contract);
+      setVerdict(null);
+      setHistory(EMPTY_HISTORY);
+      setAllowedCount(0);
+      setBlockedCount(0);
+      setSuiteResults([]);
+      setSelectedScenario(null);
+      appendAudit("Authority parameters revised", "neutral");
+    } catch {
+      setError("Authority revision failed. The existing snapshot remains unchanged.");
     } finally {
       setBusy(null);
     }
@@ -262,6 +293,7 @@ export function MissionControl({
           <span className="header-badge simulation-badge">
             <span aria-hidden="true" /> SIMULATION
           </span>
+          <ThemeToggle />
           <button className="reset-button" type="button" onClick={resetLab}>
             <ResetIcon />
             Reset Lab
@@ -333,6 +365,11 @@ export function MissionControl({
             compiler={compiler}
             approving={busy === "approve"}
             onApprove={approveCurrentContract}
+          />
+          <ContractParameterEditor
+            contract={contract}
+            revising={busy === "revise"}
+            onRevise={reviseCurrentContract}
           />
         </section>
 

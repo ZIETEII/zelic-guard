@@ -18,6 +18,24 @@
   --radius: 14px;
 }
 
+html[data-theme="light"] {
+  --canvas: #edf2f3;
+  --panel: #f9fbfb;
+  --panel-raised: #ffffff;
+  --panel-soft: #f3f6f7;
+  --ink: #172126;
+  --muted: #53646e;
+  --dim: #73818a;
+  --border: rgba(23, 33, 38, 0.13);
+  --border-strong: rgba(23, 33, 38, 0.22);
+  --violet: #725ad3;
+  --cyan: #047da8;
+  --allow: #147a4c;
+  --deny: #c33f3a;
+  --focus: #6248c8;
+  color-scheme: light;
+}
+
 @theme inline {
   --color-background: var(--canvas);
   --color-foreground: var(--ink);
@@ -48,6 +66,13 @@ body {
   color: var(--ink);
   font-family: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
   text-rendering: optimizeLegibility;
+}
+
+html[data-theme="light"] body {
+  background-image:
+    linear-gradient(rgba(23, 33, 38, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 33, 38, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 50% -20%, rgba(4, 125, 168, 0.11), transparent 38rem);
 }
 
 button,
@@ -202,6 +227,37 @@ button:disabled {
   min-height: 38px;
   padding: 0 13px;
   background: rgba(255, 255, 255, 0.035);
+}
+
+.theme-toggle {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  padding: 0 11px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--ink);
+  cursor: pointer;
+  font: 600 10px "Geist Mono", monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.theme-toggle:hover {
+  border-color: rgba(155, 135, 245, 0.52);
+  background: rgba(155, 135, 245, 0.1);
+}
+
+.theme-toggle svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
 }
 
 .operator-login-link,
@@ -589,6 +645,77 @@ button:disabled {
 
 .contract-inspector {
   padding: 20px;
+}
+
+.parameter-editor {
+  display: grid;
+  gap: 14px;
+  border-top: 1px solid var(--border);
+  padding: 20px;
+}
+
+.parameter-editor-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.parameter-editor-heading > div {
+  display: grid;
+  gap: 5px;
+}
+
+.parameter-editor h3 {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+}
+
+.revision-notice {
+  border: 1px solid rgba(255, 107, 99, 0.28);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: #ffaaa5;
+  font: 600 9px "Geist Mono", monospace;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.parameter-editor > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.parameter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.parameter-grid label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.parameter-grid input {
+  min-width: 0;
+  min-height: 40px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: #0a0b0c;
+  color: var(--ink);
+  font: 11px "Geist Mono", monospace;
+}
+
+.parameter-editor .button-secondary {
+  justify-self: start;
 }
 
 .inspector-heading {
@@ -1798,7 +1925,8 @@ button:disabled {
 
   .panel-heading,
   .intent-editor,
-  .contract-inspector {
+  .contract-inspector,
+  .parameter-editor {
     padding-right: 16px;
     padding-left: 16px;
   }
@@ -1898,6 +2026,21 @@ button:disabled {
     min-width: 44px;
     padding: 0 11px;
     font-size: 0;
+  }
+
+  .theme-toggle {
+    min-width: 38px;
+    justify-content: center;
+    padding: 0 10px;
+  }
+
+  .theme-toggle span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   .operator-badge {
@@ -2000,6 +2143,20 @@ button:disabled {
     grid-column: auto;
   }
 
+  .parameter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .parameter-editor-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .parameter-editor .button-secondary {
+    width: 100%;
+  }
+
   .authority-actions {
     align-items: stretch;
     flex-direction: column;
@@ -2051,4 +2208,40 @@ button:disabled {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+html[data-theme="light"] .stage-panel,
+html[data-theme="light"] .execution-panel,
+html[data-theme="light"] .audit-panel,
+html[data-theme="light"] .developer-panel,
+html[data-theme="light"] .login-card {
+  background: rgba(249, 251, 251, 0.94);
+  box-shadow: 0 24px 80px rgba(44, 59, 65, 0.12);
+}
+
+html[data-theme="light"] .intent-editor textarea,
+html[data-theme="light"] .parameter-grid input,
+html[data-theme="light"] .json-disclosure pre,
+html[data-theme="light"] .quickstart-code,
+html[data-theme="light"] .login-form input {
+  background: #ffffff;
+}
+
+html[data-theme="light"] .contract-fields dd,
+html[data-theme="light"] .contract-fields .hash-value {
+  color: var(--ink);
+}
+
+html[data-theme="light"] .header-badge,
+html[data-theme="light"] .mode-badge {
+  color: #46545d;
+}
+
+html[data-theme="light"] .operator-login-link,
+html[data-theme="light"] .button-authority {
+  color: #075d7c;
+}
+
+html[data-theme="light"] .revision-notice {
+  color: #a3332f;
 }

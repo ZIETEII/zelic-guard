@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { LoginForm } from "@/components/auth/login-form";
 import { BrandMark } from "@/components/guard/brand-mark";
+import { ThemeToggle } from "@/components/guard/theme-toggle";
 import { getCurrentOperatorSession } from "@/lib/auth/operator-session.server";
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ export default async function LoginPage() {
         <span className="header-badge simulation-badge">
           <span aria-hidden="true" /> SIMULATION ONLY
         </span>
+        <ThemeToggle />
       </header>
 
       <div className="login-layout">

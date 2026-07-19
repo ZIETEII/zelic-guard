@@ -5,8 +5,12 @@ import { REASON_CODES } from "./reason-codes";
 const identifierPattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$/;
 const policyTokenPattern = /^[a-z][a-z0-9_:-]{1,63}$/;
 const sha256Pattern = /^sha256:[a-f0-9]{64}$/;
-const boundedCostSchema = z.number().finite().nonnegative().max(1_000_000);
-const zonedDateTimeSchema = z.iso.datetime({ offset: true });
+export const boundedCostSchema = z
+  .number()
+  .finite()
+  .nonnegative()
+  .max(1_000_000);
+export const zonedDateTimeSchema = z.iso.datetime({ offset: true });
 
 export const schemaVersionSchema = z.literal("1.0");
 
@@ -59,6 +63,24 @@ export const contractConstraintsSchema = z.strictObject({
     maxRuns: z.number().int().positive().max(1_000),
     expiresAt: zonedDateTimeSchema,
   });
+
+export const contractRevisionPatchSchema = z.strictObject({
+  allowedRecipients: z
+    .array(normalizedEmailSchema)
+    .min(1)
+    .max(20)
+    .superRefine((recipients, context) => {
+      if (new Set(recipients).size !== recipients.length) {
+        context.addIssue({
+          code: "custom",
+          message: "Recipients must be unique after normalization",
+        });
+      }
+    }),
+  maxCost: boundedCostSchema,
+  maxRuns: z.number().int().positive().max(1_000),
+  expiresAt: zonedDateTimeSchema,
+});
 
 export const intentContractSchema = z.strictObject({
     schemaVersion: schemaVersionSchema,
