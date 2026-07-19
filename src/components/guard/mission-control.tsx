@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AuditTimeline, type AuditItem } from "./audit-timeline";
 import { BrandMark } from "./brand-mark";
 import { ContractInspector } from "./contract-inspector";
+import { DeveloperQuickstart } from "./developer-quickstart";
 import {
   ExecutionGate,
   type ThreatSuiteResult,
@@ -236,6 +237,7 @@ export function MissionControl() {
         </div>
         <div className="header-actions">
           <span className="header-badge">OPENAI BUILD WEEK</span>
+          <span className="header-badge judge-badge">PUBLIC JUDGE SANDBOX</span>
           <span className="header-badge simulation-badge">
             <span aria-hidden="true" /> SIMULATION
           </span>
@@ -328,6 +330,8 @@ export function MissionControl() {
       </div>
 
       <AuditTimeline items={audit} />
+
+      <DeveloperQuickstart />
 
       <div
         className={error ? "error-banner" : "sr-status"}

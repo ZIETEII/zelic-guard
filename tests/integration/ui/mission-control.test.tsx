@@ -176,6 +176,22 @@ describe("ZELIC Guard mission control", () => {
     expect(screen.queryByText("IMMUTABLE EVIDENCE")).not.toBeInTheDocument();
   });
 
+  it("presents the server API path and public judge sandbox", () => {
+    render(<MissionControl />);
+
+    expect(screen.getByText("PUBLIC JUDGE SANDBOX")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Integrate in three requests" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("POST /api/compile")).toBeInTheDocument();
+    expect(screen.getByText("POST /api/approve")).toBeInTheDocument();
+    expect(screen.getByText("POST /api/evaluate")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "View source" })).toHaveAttribute(
+      "href",
+      "https://github.com/ZIETEII/zelic-guard",
+    );
+  });
+
   it("shows cost, replay, expiry, counters, JSON, audit order, and pristine reset", async () => {
     const user = userEvent.setup();
     installGuardApiMock();
