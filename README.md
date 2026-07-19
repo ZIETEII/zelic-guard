@@ -4,7 +4,7 @@
 
 **AI agents can plan freely. They can act only inside an approved contract.**
 
-[Live judge sandbox](https://zelic-guard-build-week.vercel.app) · [Build evidence](./BUILD_WEEK_EVIDENCE.md) · [Five-minute judge plan](./docs/JUDGE_TEST_PLAN.md) · [Demo script](./docs/DEMO_SCRIPT.md)
+[Live judge sandbox](https://zelic-guard-build-week.vercel.app) · [Optional operator login](https://zelic-guard-build-week.vercel.app/login) · [Build evidence](./BUILD_WEEK_EVIDENCE.md) · [Five-minute judge plan](./docs/JUDGE_TEST_PLAN.md) · [Demo script](./docs/DEMO_SCRIPT.md)
 
 ZELIC Guard is a runtime authority layer for autonomous systems. It turns an agent's natural-language request into a typed contract, requires explicit human approval, and evaluates every attempted action against ten deterministic policy checks. Scope drift, recipient drift, cost overruns, expired authority, exhausted run limits, and replay attacks fail closed with machine-readable evidence.
 
@@ -33,7 +33,9 @@ The model cannot approve itself, change the rules, hide failed checks, or consum
 5. Select **Run full threat suite**.
 6. Observe one valid `ALLOW`, four adversarial `DENY` decisions, ten ordered checks per attempt, reason codes, counters, and the deterministic audit timeline.
 
-No login is required for the judge path. That is deliberate: this sandbox stores no user data and must be independently testable without account creation or credentials.
+No login is required for the judge path. That is deliberate: this sandbox stores no user data and must be independently testable without account creation or credentials. Judges can optionally open **Operator login**, select **Use demo credentials**, and enter the same lab through a real server-validated session boundary.
+
+![Optional ZELIC Guard operator login with stateless server session](./docs/assets/07-operator-login.jpg)
 
 ## What is novel
 
@@ -61,6 +63,8 @@ flowchart LR
 
 The framework-independent domain lives in [`src/lib/guard`](./src/lib/guard). Next.js Route Handlers validate both request and response boundaries and keep the optional OpenAI SDK behind a server-only module.
 
+The optional operator path is deliberately stateless: scrypt verifies one environment-configured demo password, an HMAC-SHA256 signature protects a four-hour HttpOnly session cookie, and `/workspace` checks that cookie during every server render. A database would add no useful evidence because there are no signups, profiles, private records, or persistent permissions.
+
 ## Policy matrix
 
 | Rule | Failure code |
@@ -85,6 +89,8 @@ A valid attempt returns `ALL_RULES_PASSED`.
 | `POST /api/compile` | Compile natural language into a proposed contract using `auto`, `openai`, or `deterministic` mode. |
 | `POST /api/approve` | Verify the proposed authority fingerprint and return an approved contract. |
 | `POST /api/evaluate` | Evaluate a contract, attempt, explicit clock value, and explicit history snapshot. |
+| `POST /api/auth/login` | Validate the demo operator and create a bounded same-site session. |
+| `POST /api/auth/logout` | Expire the operator session cookie. |
 
 ```bash
 curl -X POST http://localhost:3000/api/compile \
@@ -124,6 +130,16 @@ OPENAI_MODEL=gpt-5.6
 
 Never prefix either value with `NEXT_PUBLIC_`.
 
+The optional local operator workspace additionally reads these server-only values:
+
+```dotenv
+ZELIC_AUTH_EMAIL=judge@zelic.guard
+ZELIC_AUTH_PASSWORD_SCRYPT=scrypt$base64url_salt$base64url_hash
+ZELIC_SESSION_SECRET=at-least-32-random-bytes
+```
+
+Production uses a scrypt verifier rather than a plaintext password. The judge-facing **Use demo credentials** control fills the public simulation account; it does not expose or unlock private data.
+
 ## Verification
 
 ```bash
@@ -133,7 +149,7 @@ npm run test:run
 npm run build
 ```
 
-The suite covers strict schemas, canonical serialization, stable SHA‑256 identity, every policy rule, replay isolation, approval integrity, compiler fallback, OpenAI structured-output validation, API boundaries, security headers, and the complete UI flow.
+The suite covers strict schemas, canonical serialization, stable SHA‑256 identity, every policy rule, replay isolation, approval integrity, compiler fallback, OpenAI structured-output validation, API boundaries, signed-session tamper and expiry checks, request-time authentication rendering, security headers, and the complete UI flow.
 
 ## How Codex and GPT‑5.6 were used
 
@@ -145,7 +161,7 @@ The suite covers strict schemas, canonical serialization, stable SHA‑256 ident
 ## Security and honesty boundaries
 
 - No email, payment, or third-party mutation code exists.
-- No database or authentication provider is needed for the public sandbox.
+- No database or authentication provider is needed. The public sandbox remains open; the optional operator workspace uses a stateless server-validated demo session.
 - Secrets stay server-only and are never logged or serialized to the client.
 - CSP, clickjacking protection, MIME sniffing protection, a strict referrer policy, and browser permission restrictions apply to every route.
 - The public compile endpoint should be protected with the Vercel Firewall rule described in [`docs/SECURITY.md`](./docs/SECURITY.md).

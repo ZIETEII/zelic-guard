@@ -75,7 +75,17 @@ Include loading, initial/empty, error, proposed, approved, allowed, denied, expi
 
 Use the generated Next.js 16 App Router project with TypeScript, React 19, Tailwind CSS 4, and Vercel deployment.
 
-Do not add a database or authentication for this public demo. Do not use Clerk, Supabase, Firebase, Auth0, Redis, or unrelated services.
+Do not add a database or gate the public demo behind authentication. Do not use Clerk, Supabase, Firebase, Auth0, Redis, or unrelated services.
+
+### Post-brief expansion — optional operator access (2026-07-19)
+
+A later entrant request adds an optional identity demonstration without changing the public judging requirement:
+
+- `/` remains the credential-free canonical judge path.
+- `/login` may create a short-lived session for one environment-configured demo operator, and `/workspace` may render the same simulation lab only after validating that session at request time.
+- Password verification and session signing remain server-only. The browser receives only a secure, HttpOnly, same-site cookie.
+- No database, signup, profile, private customer data, third-party authentication product, or persistent policy state is added.
+- Authentication never approves a contract or changes an execution verdict; it demonstrates an outer identity boundary around the same simulation-only authority engine.
 
 Implement a framework-independent domain layer under `src/lib/guard/`:
 

@@ -1,6 +1,6 @@
 # ZELIC Guard — Demo Script
 
-Target length: **2:35–2:50**. The public YouTube video must remain under three minutes and include spoken audio.
+Target length: **2:40–2:55**. The public YouTube video must remain under three minutes and include spoken audio.
 
 ## Before recording
 
@@ -18,19 +18,25 @@ Target length: **2:35–2:50**. The public YouTube video must remain under three
 
 Show the top of the mission-control screen and the **Simulation only** disclosure.
 
-### 0:18–0:43 — Compile intent
+### 0:18–0:30 — Optional identity boundary
+
+> “The judge sandbox stays open. This optional operator path adds a real server-validated session without a database, private data, or third-party auth.”
+
+Open **Operator login**, select **Use demo credentials**, sign in, and show the **Operator workspace** badge.
+
+### 0:30–0:52 — Compile intent
 
 > “A natural-language request is compiled server-side by GPT‑5.6 into a strict typed contract. Every model-produced field is validated with Zod. When credentials are absent, the same judge path uses an honest deterministic fallback.”
 
 Select **Compile contract**. Point to the visible compiler badge.
 
-### 0:43–1:05 — Human authority
+### 0:52–1:12 — Human authority
 
 > “The model can propose, but it cannot authorize itself. A human reviews the action, recipient, cost ceiling, expiry, run limit, resource fingerprint, and the SHA‑256 authority fingerprint before approval.”
 
 Scroll through the contract and select **Approve contract**.
 
-### 1:05–1:42 — One-click threat suite
+### 1:12–1:48 — One-click threat suite
 
 > “Now I challenge all five boundaries through the real server evaluation route.”
 
@@ -40,19 +46,19 @@ Select **Run full threat suite**.
 
 Show the 1 ALLOW / 4 DENY report, one failed check, and the counters.
 
-### 1:42–2:05 — Deterministic evidence
+### 1:48–2:10 — Deterministic evidence
 
 > “Time and replay history are explicit inputs. The policy engine is pure and framework-independent, so identical validated inputs produce identical evidence. The lab never sends an email, makes a payment, or mutates a third party.”
 
 Show the ordered checks, contract JSON, and audit timeline.
 
-### 2:05–2:28 — Developer tool
+### 2:10–2:34 — Developer tool
 
-> “Developers integrate through three validated endpoints: compile, approve, and evaluate. The public sandbox needs no login, and the repository includes sample data, 100-plus tests, a five-minute judge plan, and complete Build Week provenance.”
+> “Developers integrate through three validated guard endpoints: compile, approve, and evaluate. The public sandbox needs no login, and the repository includes sample data, 100-plus tests, a five-minute judge plan, and complete Build Week provenance.”
 
 Show **Integrate in three requests** and the live API curl example.
 
-### 2:28–2:45 — Codex and GPT‑5.6
+### 2:34–2:52 — Codex and GPT‑5.6
 
 > “Codex and GPT‑5.6 helped turn the brief into the architecture, test-first implementation, security review, responsive product, and verification trail. GPT‑5.6 structures intent; the deterministic guard—not the model—owns execution authority.”
 

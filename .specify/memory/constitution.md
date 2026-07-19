@@ -1,9 +1,9 @@
 # ZELIC Guard Constitution
 
 **Project:** ZELIC Guard — Intent Contracts for AI Agents  
-**Version:** 1.0.0  
+**Version:** 1.1.0
 **Ratified:** 2026-07-18  
-**Last amended:** 2026-07-18
+**Last amended:** 2026-07-19
 
 ## Purpose
 
@@ -36,7 +36,7 @@ Malformed, ambiguous, missing, stale, or out-of-scope data fails closed.
 - Zod validates contracts, constraints, attempts, compiler inputs, compiler outputs, and route bodies.
 - Rules cover approval, expiry, action, channel, target, recipient allowlist, resource fingerprint, cost ceiling, max runs, and replayed execution IDs.
 - Route handlers are same-origin and do not add wildcard CORS.
-- No database, authentication product, external action service, real recipient, or real payment is part of the public demo.
+- The root judge sandbox remains credential-free and database-free. An optional operator workspace may use one server-configured demo identity and a short-lived, signed, HttpOnly session, but it cannot add private data, signup flows, external action services, or authority beyond the approved contract.
 - The application must visibly state: “Simulation only — no email or payment is sent.”
 
 ## IV. Offline operation is a release requirement
@@ -106,3 +106,7 @@ This constitution overrides conflicting convenience decisions in plans and tasks
 - **PATCH:** clarifies language without changing obligations.
 
 Every implementation review must confirm compliance with the constitution and the Build Week brief before work is declared complete.
+
+### Amendment record
+
+- **1.1.0 — 2026-07-19: Optional operator identity boundary.** Rationale: the entrant explicitly requested a real login demonstration after the public judge sandbox was complete. Migration impact: `/` remains unchanged and independently testable without credentials; `/login` and `/workspace` add an optional stateless operator boundary backed only by server environment configuration and a four-hour signed cookie. No database, account creation, privileged data, external mutation, or policy-engine state was introduced. Existing judge links and clean-clone behavior require no migration.

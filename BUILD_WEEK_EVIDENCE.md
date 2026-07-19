@@ -727,3 +727,126 @@ Observed 2026-07-18 at 23:47–23:49 America/Bogota: ESLint and TypeScript were 
 Real-browser desktop verification at 1440×960 completed compile → approve → full threat suite through the actual local Route Handlers. The final report contained `ALL_RULES_PASSED`/ALLOW plus four specific DENY reason codes, counters read `Allowed 1 · Blocked 4`, the audit contained seven deterministic events, page `scrollWidth` exactly matched 1440px, and the console had no warnings or errors.
 
 The same complete flow passed at 390×844 after the responsive correction. The final mobile report displayed all five outcomes as readable rows, had no page overflow, and produced no console warnings or errors. Release screenshots are stored under `docs/assets/` for repository and submission use.
+
+## Phase 9 — Optional operator identity boundary
+
+The entrant requested a real login experience after the credential-free judge sandbox was complete. Constitution amendment 1.1.0 preserves `/` as the canonical public path and permits an optional stateless `/login` → `/workspace` boundary. No database was added because the demo has one environment-configured operator, no signup or profile state, no private records, and no durable permissions. Authentication never approves a contract or changes a policy verdict.
+
+### T058 signed and bounded session token
+
+Focused command:
+
+```bash
+npm run test:run -- tests/unit/auth/session.test.ts
+```
+
+- **RED:** 2026-07-18 23:58 America/Bogota, collection failed because `@/lib/auth/session.server` did not exist.
+- **GREEN:** the focused file passed 2/2 after implementing a strict versioned payload, HMAC-SHA256 signature, four-hour expiry, constant-time signature comparison, and fail-closed malformed/tampered/expired handling.
+- **Full GREEN:** 19 files and 105 tests passed.
+
+### T059 scrypt credential verification
+
+Focused command:
+
+```bash
+npm run test:run -- tests/unit/auth/credentials.test.ts
+```
+
+- **RED:** collection failed because `@/lib/auth/credentials.server` did not exist.
+- **GREEN:** the focused file passed 2/2 after adding strict login/config schemas, salted 64-byte scrypt verifiers, timing-safe password comparison, and complete server-environment validation.
+- **Full GREEN:** 20 files and 107 tests passed.
+
+### T060 login and logout route boundaries
+
+Focused command:
+
+```bash
+npm run test:run -- tests/integration/api/auth-routes.test.ts
+```
+
+- **RED:** collection failed because `/api/auth/login` and `/api/auth/logout` did not exist.
+- **GREEN:** 3/3 tests passed. Valid credentials set a bounded HttpOnly, same-site cookie; invalid credentials, unknown fields, and missing configuration fail closed; logout expires the cookie through a POST mutation route.
+- **Full GREEN:** 21 files and 110 tests passed.
+
+### T061 judge-safe login and protected workspace UI
+
+Focused commands:
+
+```bash
+npm run test:run -- tests/integration/ui/login-form.test.tsx
+npm run test:run -- tests/integration/ui/login-form.test.tsx tests/integration/ui/mission-control.test.tsx
+```
+
+- **RED:** collection and UI assertions failed because the login form, public `Operator login` link, operator badge, and logout control did not exist.
+- **GREEN:** 2 focused files and 10 tests passed after adding the optional login screen, public demo credential helper, server-protected workspace, operator identity badge, and logout control.
+- **Harness correction:** the MissionControl unit harness received the required App Router mock for the new logout client component; production behavior was unchanged.
+- **Full GREEN:** 22 files and 113 tests passed.
+
+### T062 request-time authorization rendering
+
+The first optimized build exposed a security-relevant rendering defect: Next.js emitted `/workspace` as a static page containing the build-time redirect to `/login`. A valid runtime cookie could therefore never authorize the page.
+
+Focused command:
+
+```bash
+npm run test:run -- tests/architecture/auth-rendering.test.ts
+```
+
+- **RED:** 2026-07-19 00:09 America/Bogota, 1 test failed because both page modules exported `dynamic` as `undefined`.
+- **GREEN:** 00:10, 1/1 passed after forcing `/login` and `/workspace` to request-time rendering.
+- **Full GREEN:** 23 files and 114 tests passed.
+
+The corrected optimized build now reports both auth pages as dynamic server routes:
+
+```text
+ƒ /login
+ƒ /workspace
+```
+
+Phase 9 checkpoint commands:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:run
+npm run build
+```
+
+Observed 2026-07-19 at 00:10 America/Bogota: ESLint and TypeScript exited 0; Vitest passed 23 files and 114 tests; Next.js 16.2.10 completed the optimized Turbopack build and emitted all five API routes plus request-time `/login` and `/workspace`. Real-browser and deployed-production evidence is recorded after the release verification below.
+
+### T063 fail-closed logout presentation
+
+Focused command:
+
+```bash
+npm run test:run -- tests/integration/ui/logout-button.test.tsx
+```
+
+- **RED:** 2026-07-19 00:13 America/Bogota, 1 test failed and Vitest reported one unhandled rejection because a failed logout request produced neither a visible alert nor a caught promise.
+- **GREEN:** 1/1 passed after the control caught network, response, and schema failures, retained the current route, and announced `Sign out failed safely. Try again.`
+- **Full GREEN:** 24 files and 115 tests passed.
+
+### Local real-browser acceptance
+
+At 1440×960 the actual Next.js development server was exercised through this sequence:
+
+1. `/` loaded as `PUBLIC JUDGE SANDBOX` without credentials and had `scrollWidth === innerWidth === 1440`.
+2. Direct unauthenticated navigation to `/workspace` redirected to `/login`.
+3. **Use demo credentials** filled only the public simulation identity; **Sign in to workspace** created the server session and navigated to the request-time protected page.
+4. The authenticated lab compiled and approved the seeded contract, then ran the complete threat suite through the real Route Handlers. The report returned exactly one `ALLOW`, four `DENY`, five readable outcomes, `Allowed 1 · Blocked 4`, and seven deterministic audit events.
+5. **Sign out** returned to `/login`; a second direct `/workspace` request again redirected to `/login`, proving the expired cookie no longer authorized the page.
+
+The same authenticated report and logout path were verified at 390×844. Mobile metrics showed five threat rows, a visible sign-out control, and `scrollWidth === innerWidth === 390`. Desktop and mobile console scans returned no warnings or errors. The reviewed 3:2 login capture is stored at `docs/assets/07-operator-login.jpg`; three malformed temporary captures generated during browser stitching were deleted and were never part of the release.
+
+Final local Phase 9 gates at 00:19 America/Bogota:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:run
+npm run build
+npm audit --audit-level=moderate
+git diff --check
+```
+
+All commands exited 0. Vitest passed 24 files and 115 tests, the optimized build kept both auth pages dynamic, npm reported 0 vulnerabilities, and the diff whitespace check was clean.

@@ -4,7 +4,17 @@
 
 ZELIC Guard is a simulation lab. It never sends email, creates a payment, or mutates a third-party service. Fixtures use reserved `.test` recipients and synthetic payment amounts.
 
-The public demo deliberately has no login or database. It stores no user account data, and the evaluator receives time and replay history explicitly. A production integration should persist replay consumption transactionally behind the existing history interface; it must not add mutable state to the pure evaluator.
+The canonical public demo deliberately has no login requirement or database. It stores no user account data, and the evaluator receives time and replay history explicitly. A production integration should persist replay consumption transactionally behind the existing history interface; it must not add mutable state to the pure evaluator.
+
+## Optional operator session
+
+- `/login` and `/workspace` demonstrate an outer identity boundary without changing the public judge path.
+- One demo operator is configured with `ZELIC_AUTH_EMAIL`, a salted scrypt verifier in `ZELIC_AUTH_PASSWORD_SCRYPT`, and a random `ZELIC_SESSION_SECRET` of at least 32 bytes.
+- The plaintext password is not stored in Vercel. Successful login creates a four-hour HMAC-SHA256 session cookie with `HttpOnly`, `SameSite=Strict`, `Path=/`, high priority, and `Secure` in production.
+- Login and workspace pages are forced to request-time rendering so build-time environment or cookie state can never freeze an authorization decision.
+- Login input, auth responses, and session payloads use strict Zod schemas. Invalid, expired, malformed, tampered, or weakly configured sessions fail closed.
+- The judge demo identity is intentionally public and unlocks only synthetic simulation data. It is not suitable for private or privileged production data.
+- No signup, reset, profile, OAuth provider, account table, or durable session store exists; therefore a database would add attack surface without serving a product requirement.
 
 ## Server-only secrets
 
@@ -12,10 +22,12 @@ The public demo deliberately has no login or database. It stores no user account
 - Neither variable may use a `NEXT_PUBLIC_` prefix.
 - Provider errors are sanitized; credentials, authorization headers, and raw provider payloads are not logged.
 - `.env.local` and all secret-bearing `.env.*.local` files remain ignored.
+- `ZELIC_AUTH_PASSWORD_SCRYPT` and `ZELIC_SESSION_SECRET` are also server-only and must never use a `NEXT_PUBLIC_` prefix.
 
 ## Route boundaries
 
 - Compile, approve, and evaluate inputs are strict Zod objects.
+- Login input and every authentication response are strict Zod objects.
 - Model-produced values and successful route responses are also parsed through strict schemas.
 - Unknown fields and malformed JSON fail closed.
 - Routes are same-origin and do not opt into wildcard CORS.
@@ -26,7 +38,7 @@ The public demo deliberately has no login or database. It stores no user account
 The public `/api/compile` route can incur model cost when GPT‑5.6 is enabled. Before enabling the production key, configure a Vercel WAF rule:
 
 1. Open the linked project in Vercel and choose **Firewall → Configure → New Rule**.
-2. Match request path `/api/compile` and method `POST`.
+2. Match request path `/api/compile` and method `POST`. Add a separate rule for `/api/auth/login` before using any non-demo credentials.
 3. Choose **Rate Limit**, fixed window, counted by IP or JA4 digest.
 4. Start in **Log** mode, inspect legitimate traffic, then use the default `429` response.
 5. A conservative demo starting point is 10 requests per minute per source; adjust only after observing traffic.

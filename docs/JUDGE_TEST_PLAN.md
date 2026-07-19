@@ -25,6 +25,17 @@ Open [https://zelic-guard-build-week.vercel.app](https://zelic-guard-build-week.
 
 The application must never claim that an email, payment, or third-party action occurred.
 
+## Optional operator boundary — one additional minute
+
+1. From the public header, select **Operator login**.
+2. Select **Use demo credentials**, then **Sign in to workspace**.
+   - Expected: `/workspace` loads with an **OPERATOR WORKSPACE** badge.
+   - Expected: the guard behavior and simulation disclosure remain unchanged.
+3. Select **Sign out**.
+   - Expected: the session is expired and `/workspace` redirects back to `/login` until a new valid login.
+
+This account contains only public synthetic demo data. The session proves a real server-side identity boundary; it does not grant external action authority.
+
 ## Clean local reproduction
 
 ```bash
