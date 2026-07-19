@@ -19,20 +19,20 @@
 }
 
 html[data-theme="light"] {
-  --canvas: #edf2f3;
-  --panel: #f9fbfb;
+  --canvas: #f7f8fc;
+  --panel: #ffffff;
   --panel-raised: #ffffff;
-  --panel-soft: #f3f6f7;
-  --ink: #172126;
-  --muted: #53646e;
-  --dim: #73818a;
-  --border: rgba(23, 33, 38, 0.13);
-  --border-strong: rgba(23, 33, 38, 0.22);
-  --violet: #725ad3;
-  --cyan: #047da8;
-  --allow: #147a4c;
-  --deny: #c33f3a;
-  --focus: #6248c8;
+  --panel-soft: #f1f4fa;
+  --ink: #111827;
+  --muted: #4b5d73;
+  --dim: #718096;
+  --border: #dbe3ef;
+  --border-strong: #c4d0df;
+  --violet: #6d56d9;
+  --cyan: #087ea4;
+  --allow: #087c55;
+  --deny: #b42318;
+  --focus: #5c46cb;
   color-scheme: light;
 }
 
@@ -70,9 +70,10 @@ body {
 
 html[data-theme="light"] body {
   background-image:
-    linear-gradient(rgba(23, 33, 38, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(23, 33, 38, 0.045) 1px, transparent 1px),
-    radial-gradient(circle at 50% -20%, rgba(4, 125, 168, 0.11), transparent 38rem);
+    linear-gradient(rgba(75, 93, 115, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(75, 93, 115, 0.04) 1px, transparent 1px),
+    radial-gradient(circle at 15% -15%, rgba(109, 86, 217, 0.12), transparent 32rem),
+    radial-gradient(circle at 87% 6%, rgba(8, 126, 164, 0.11), transparent 30rem);
 }
 
 button,
@@ -2215,21 +2216,139 @@ html[data-theme="light"] .execution-panel,
 html[data-theme="light"] .audit-panel,
 html[data-theme="light"] .developer-panel,
 html[data-theme="light"] .login-card {
-  background: rgba(249, 251, 251, 0.94);
-  box-shadow: 0 24px 80px rgba(44, 59, 65, 0.12);
+  background: var(--panel);
+  box-shadow: 0 18px 48px rgba(38, 52, 74, 0.1);
+}
+
+html[data-theme="light"] .workflow-rail {
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(38, 52, 74, 0.08);
+}
+
+html[data-theme="light"] .reset-button,
+html[data-theme="light"] .theme-toggle,
+html[data-theme="light"] .button-secondary,
+html[data-theme="light"] .scenario-card {
+  background: #ffffff;
+}
+
+html[data-theme="light"] .reset-button:hover:not(:disabled),
+html[data-theme="light"] .button-secondary:hover:not(:disabled),
+html[data-theme="light"] .scenario-card:hover:not(:disabled) {
+  background: rgba(114, 90, 211, 0.1);
+  border-color: rgba(114, 90, 211, 0.42);
 }
 
 html[data-theme="light"] .intent-editor textarea,
 html[data-theme="light"] .parameter-grid input,
-html[data-theme="light"] .json-disclosure pre,
-html[data-theme="light"] .quickstart-code,
 html[data-theme="light"] .login-form input {
   background: #ffffff;
+}
+
+html[data-theme="light"] .button-primary {
+  border-color: #5f48ce;
+  background: linear-gradient(135deg, #816cf0, #654cd4);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(101, 76, 212, 0.18);
+}
+
+html[data-theme="light"] .button-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #907ef5, #7057de);
+}
+
+html[data-theme="light"] .button-suite {
+  border-color: #087c55;
+  background: #087c55;
+  color: #ffffff;
+}
+
+html[data-theme="light"] .button-authority,
+html[data-theme="light"] .operator-login-link {
+  border-color: #a7d9e8;
+  background: #eaf8fc;
+}
+
+html[data-theme="light"] button:disabled {
+  opacity: 1;
+  border-color: #dbe3ef;
+  background: #edf1f6;
+  color: #96a2b3;
 }
 
 html[data-theme="light"] .contract-fields dd,
 html[data-theme="light"] .contract-fields .hash-value {
   color: var(--ink);
+}
+
+html[data-theme="light"] .intent-editor label,
+html[data-theme="light"] .login-form label,
+html[data-theme="light"] .empty-state p,
+html[data-theme="light"] .verdict-empty strong,
+html[data-theme="light"] .check-copy strong,
+html[data-theme="light"] .audit-list strong,
+html[data-theme="light"] .public-sandbox-link {
+  color: #28363d;
+}
+
+html[data-theme="light"] .status-proposed {
+  border-color: rgba(114, 90, 211, 0.34);
+  color: #5f47b1;
+}
+
+html[data-theme="light"] .status-approved {
+  border-color: rgba(4, 125, 168, 0.38);
+  color: #075d7c;
+}
+
+html[data-theme="light"] .developer-signals span,
+html[data-theme="light"] .demo-access-box span,
+html[data-theme="light"] .demo-access-box button {
+  color: #176642;
+}
+
+html[data-theme="light"] .quickstart-code code {
+  color: #d8f5e6;
+}
+
+html[data-theme="light"] .quickstart-code,
+html[data-theme="light"] .json-disclosure pre,
+html[data-theme="light"] .suite-report {
+  border-color: #243047;
+  background: #172033;
+}
+
+html[data-theme="light"] .json-disclosure pre {
+  color: #d7e2f0;
+}
+
+html[data-theme="light"] .suite-report-heading,
+html[data-theme="light"] .suite-report li {
+  border-color: rgba(219, 227, 239, 0.16);
+}
+
+html[data-theme="light"] .suite-report-heading strong {
+  color: #f5f8fc;
+}
+
+html[data-theme="light"] .suite-report li span,
+html[data-theme="light"] .suite-report li code {
+  color: #aab8ca;
+}
+
+html[data-theme="light"] .suite-runner {
+  border-color: #abe1cd;
+  background: linear-gradient(120deg, #e7f8f0, #f8fffb 66%);
+}
+
+html[data-theme="light"] .session-error {
+  background: #fff4f3;
+  color: #a3332f;
+  box-shadow: 0 8px 28px rgba(115, 42, 39, 0.14);
+}
+
+html[data-theme="light"] .login-error,
+html[data-theme="light"] .error-banner {
+  color: #a3332f;
 }
 
 html[data-theme="light"] .header-badge,
@@ -2240,6 +2359,10 @@ html[data-theme="light"] .mode-badge {
 html[data-theme="light"] .operator-login-link,
 html[data-theme="light"] .button-authority {
   color: #075d7c;
+}
+
+html[data-theme="light"] .operator-badge {
+  color: #176642;
 }
 
 html[data-theme="light"] .revision-notice {
