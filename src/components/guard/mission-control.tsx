@@ -5,7 +5,10 @@ import { useState } from "react";
 import { AuditTimeline, type AuditItem } from "./audit-timeline";
 import { BrandMark } from "./brand-mark";
 import { ContractInspector } from "./contract-inspector";
-import { ExecutionGate } from "./execution-gate";
+import {
+  ExecutionGate,
+  type ThreatSuiteResult,
+} from "./execution-gate";
 import {
   compileIntentResponseSchema,
   type CompileIntentResponse,
@@ -13,6 +16,7 @@ import {
 import {
   createDemoEvaluationInput,
   INVOICE_INTENT,
+  SCENARIOS,
   SIMULATION_DISCLOSURE,
   type DemoHistorySnapshot,
   type ScenarioId,
@@ -35,6 +39,10 @@ const AUDIT_TIMESTAMPS = [
   "2026-07-18T17:00:03.000Z",
   "2026-07-18T17:00:04.000Z",
   "2026-07-18T17:00:05.000Z",
+  "2026-07-18T17:00:06.000Z",
+  "2026-07-18T17:00:07.000Z",
+  "2026-07-18T17:00:08.000Z",
+  "2026-07-18T17:00:09.000Z",
 ] as const;
 
 export function MissionControl() {
@@ -48,23 +56,27 @@ export function MissionControl() {
   const [audit, setAudit] = useState<AuditItem[]>([]);
   const [allowedCount, setAllowedCount] = useState(0);
   const [blockedCount, setBlockedCount] = useState(0);
+  const [suiteResults, setSuiteResults] = useState<ThreatSuiteResult[]>([]);
   const [selectedScenario, setSelectedScenario] =
     useState<ScenarioId | null>(null);
   const [busy, setBusy] =
-    useState<"compile" | "approve" | "evaluate" | null>(null);
+    useState<"compile" | "approve" | "evaluate" | "suite" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const approved = contract?.status === "approved";
+  const compilerLabel = getCompilerLabel(compiler);
+  const compilerDetail = getCompilerDetail(compiler);
 
   async function compileContract() {
     setBusy("compile");
     setError(null);
     setVerdict(null);
     setSelectedScenario(null);
+    setSuiteResults([]);
 
     try {
       const payload = compileIntentResponseSchema.parse(
-        await postJson("/api/compile", { intent, mode: "deterministic" }),
+        await postJson("/api/compile", { intent, mode: "auto" }),
       );
       setContract(payload.contract);
       setCompiler(payload.compiler);
@@ -103,6 +115,7 @@ export function MissionControl() {
     setError(null);
     setVerdict(null);
     setSelectedScenario(scenario);
+    setSuiteResults([]);
 
     try {
       const input = createDemoEvaluationInput(contract, scenario, history);
@@ -131,6 +144,64 @@ export function MissionControl() {
     }
   }
 
+  async function runThreatSuite() {
+    if (!contract || !approved) return;
+    setBusy("suite");
+    setError(null);
+    setVerdict(null);
+    setSuiteResults([]);
+    setAllowedCount(0);
+    setBlockedCount(0);
+
+    let suiteHistory: DemoHistorySnapshot = EMPTY_HISTORY;
+    let allowed = 0;
+    let blocked = 0;
+    const results: ThreatSuiteResult[] = [];
+
+    try {
+      for (const scenario of SCENARIOS) {
+        setSelectedScenario(scenario.id);
+        const input = createDemoEvaluationInput(
+          contract,
+          scenario.id,
+          suiteHistory,
+        );
+        const payload = evaluateExecutionResponseSchema.parse(
+          await postJson("/api/evaluate", input),
+        );
+        const outcome = payload.verdict.verdict;
+        setVerdict(payload.verdict);
+
+        if (outcome === "ALLOW") {
+          allowed += 1;
+          if (payload.nextHistory) suiteHistory = payload.nextHistory;
+        } else {
+          blocked += 1;
+        }
+
+        results.push({
+          scenario: scenario.id,
+          label: scenario.label,
+          verdict: outcome,
+          reason: payload.verdict.reasonCodes[0],
+        });
+        setSuiteResults([...results]);
+        appendAudit(
+          `${scenario.label}: ${outcome}`,
+          outcome === "ALLOW" ? "allow" : "deny",
+        );
+      }
+
+      setHistory(suiteHistory);
+      setAllowedCount(allowed);
+      setBlockedCount(blocked);
+    } catch {
+      setError("Threat suite stopped safely. Completed verdicts remain visible.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
   function appendAudit(label: string, outcome: AuditItem["outcome"]) {
     setAudit((items) => [
       ...items,
@@ -146,6 +217,7 @@ export function MissionControl() {
     setHistory(EMPTY_HISTORY);
     setAllowedCount(0);
     setBlockedCount(0);
+    setSuiteResults([]);
     setSelectedScenario(null);
     setError(null);
     setBusy(null);
@@ -203,7 +275,7 @@ export function MissionControl() {
               </div>
             </div>
             <span className="mode-badge">
-              <span aria-hidden="true" /> Deterministic demo
+              <span aria-hidden="true" /> {compilerLabel}
             </span>
           </div>
 
@@ -217,7 +289,7 @@ export function MissionControl() {
             />
             <div className="intent-meta">
               <span>Seeded invoice scenario</span>
-              <span>Optional GPT-5.6 adapter ready · no key required</span>
+              <span>{compilerDetail}</span>
             </div>
             <button
               className="button-primary"
@@ -243,12 +315,15 @@ export function MissionControl() {
 
         <ExecutionGate
           approved={approved}
-          evaluating={busy === "evaluate"}
+          evaluating={busy === "evaluate" || busy === "suite"}
           selectedScenario={selectedScenario}
           verdict={verdict}
           allowedCount={allowedCount}
           blockedCount={blockedCount}
+          suiteRunning={busy === "suite"}
+          suiteResults={suiteResults}
           onRun={runScenario}
+          onRunSuite={runThreatSuite}
         />
       </div>
 
@@ -263,6 +338,29 @@ export function MissionControl() {
       </div>
     </main>
   );
+}
+
+function getCompilerLabel(
+  compiler: CompileIntentResponse["compiler"] | null,
+): string {
+  if (compiler?.provider === "openai") return "GPT-5.6 live";
+  if (compiler?.fallbackReason) return "Deterministic fallback";
+  return "GPT-5.6 preferred";
+}
+
+function getCompilerDetail(
+  compiler: CompileIntentResponse["compiler"] | null,
+): string {
+  if (compiler?.provider === "openai") {
+    return `${compiler.model ?? "GPT-5.6"} compiled this authority on the server`;
+  }
+  if (compiler?.fallbackReason === "missing_api_key") {
+    return "OPENAI_API_KEY not configured · deterministic fallback used";
+  }
+  if (compiler?.fallbackReason === "provider_error") {
+    return "OpenAI provider unavailable · deterministic fallback used";
+  }
+  return "Server chooses GPT-5.6 when configured · offline fallback included";
 }
 
 function WorkflowRail({

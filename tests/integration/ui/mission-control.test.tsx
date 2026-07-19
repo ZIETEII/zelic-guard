@@ -27,7 +27,7 @@ function installGuardApiMock(): ReturnType<typeof vi.fn> {
           mode: "deterministic",
           provider: "seeded",
           model: null,
-          fallbackReason: null,
+          fallbackReason: "missing_api_key",
         },
       });
     }
@@ -122,6 +122,51 @@ describe("ZELIC Guard mission control", () => {
         "RECIPIENT_NOT_ALLOWED",
       ),
     ).toBeInTheDocument();
+  });
+
+  it("prefers GPT-5.6 automatically and discloses deterministic fallback", async () => {
+    const user = userEvent.setup();
+    const fetchMock = installGuardApiMock();
+    render(<MissionControl />);
+
+    await user.click(screen.getByRole("button", { name: "Compile contract" }));
+
+    const compileRequest = fetchMock.mock.calls.find(
+      ([path]) => String(path) === "/api/compile",
+    );
+    expect(JSON.parse(String(compileRequest?.[1]?.body))).toMatchObject({
+      intent: expect.any(String),
+      mode: "auto",
+    });
+    expect(await screen.findByText("Deterministic fallback")).toBeInTheDocument();
+    expect(screen.getByText(/OPENAI_API_KEY not configured/i)).toBeInTheDocument();
+  });
+
+  it("runs the complete adversarial suite and proves one allow with four denials", async () => {
+    const user = userEvent.setup();
+    installGuardApiMock();
+    render(<MissionControl />);
+
+    expect(
+      screen.getByRole("button", { name: "Run full threat suite" }),
+    ).toBeDisabled();
+
+    await user.click(screen.getByRole("button", { name: "Compile contract" }));
+    await screen.findByText("PROPOSED");
+    await user.click(screen.getByRole("button", { name: "Approve contract" }));
+    await screen.findByText("APPROVED");
+    await user.click(
+      screen.getByRole("button", { name: "Run full threat suite" }),
+    );
+
+    const report = await screen.findByRole("region", {
+      name: "Threat suite report",
+    });
+    expect(within(report).getByText("Threat suite complete")).toBeInTheDocument();
+    expect(within(report).getAllByText("DENY")).toHaveLength(4);
+    expect(within(report).getAllByText("ALLOW")).toHaveLength(1);
+    expect(screen.getByText("Allowed 1 · Blocked 4")).toBeInTheDocument();
+    expect(screen.getByText("Threat suite: 5/5 boundaries verified")).toBeInTheDocument();
   });
 
   it("labels the resettable audit trail as deterministic evidence", () => {

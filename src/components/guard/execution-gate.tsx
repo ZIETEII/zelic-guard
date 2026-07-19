@@ -8,7 +8,17 @@ interface ExecutionGateProps {
   readonly verdict: ExecutionVerdict | null;
   readonly allowedCount: number;
   readonly blockedCount: number;
+  readonly suiteRunning: boolean;
+  readonly suiteResults: readonly ThreatSuiteResult[];
   readonly onRun: (scenario: ScenarioId) => void;
+  readonly onRunSuite: () => void;
+}
+
+export interface ThreatSuiteResult {
+  readonly scenario: ScenarioId;
+  readonly label: string;
+  readonly verdict: "ALLOW" | "DENY";
+  readonly reason: string;
 }
 
 export function ExecutionGate({
@@ -18,7 +28,10 @@ export function ExecutionGate({
   verdict,
   allowedCount,
   blockedCount,
+  suiteRunning,
+  suiteResults,
   onRun,
+  onRunSuite,
 }: ExecutionGateProps) {
   return (
     <section className="stage-panel execution-panel" aria-labelledby="execution-title">
@@ -35,6 +48,44 @@ export function ExecutionGate({
           <span><b>{blockedCount}</b> blocked</span>
         </div>
       </div>
+
+      <div className="suite-runner">
+        <div>
+          <span className="section-kicker">ONE-CLICK PROOF</span>
+          <strong>Challenge every boundary</strong>
+          <small>1 valid run · 4 adversarial attempts · 10 checks each</small>
+        </div>
+        <button
+          className="button-suite"
+          type="button"
+          disabled={!approved || evaluating}
+          onClick={onRunSuite}
+        >
+          {suiteRunning ? "Running 5 simulations…" : "Run full threat suite"}
+        </button>
+      </div>
+
+      {suiteResults.length ? (
+        <section className="suite-report" aria-label="Threat suite report" aria-live="polite">
+          <div className="suite-report-heading">
+            <strong>
+              {suiteResults.length === SCENARIOS.length
+                ? "Threat suite complete"
+                : `Threat suite ${suiteResults.length}/${SCENARIOS.length}`}
+            </strong>
+            <span>Threat suite: {suiteResults.length}/{SCENARIOS.length} boundaries verified</span>
+          </div>
+          <ol>
+            {suiteResults.map((result) => (
+              <li key={result.scenario} className={`suite-${result.verdict.toLowerCase()}`}>
+                <span>{result.label}</span>
+                <code>{result.reason}</code>
+                <b>{result.verdict}</b>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
 
       <div className="scenario-grid" aria-label="Execution scenarios">
         {SCENARIOS.map((scenario, index) => (
