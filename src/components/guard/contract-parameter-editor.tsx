@@ -50,20 +50,21 @@ function ParameterEditorForm({
   }
 
   return (
-    <form className="parameter-editor" onSubmit={submit} aria-label="Authority parameters">
+    <form className="parameter-editor" onSubmit={submit} aria-label="Parámetros de autoridad">
       <div className="parameter-editor-heading">
         <div>
-          <span className="section-kicker">PARAMETER REVISION</span>
-          <h3>Change approved boundaries</h3>
+          <span className="section-kicker">REVISIÓN DE PARÁMETROS</span>
+          <h3>Cambia los límites aprobados</h3>
         </div>
-        <span className="revision-notice">Reapproval required</span>
+        <span className="revision-notice">Requiere aprobación</span>
       </div>
       <p>
-        Editing any boundary creates a new proposed authority snapshot. Previous approval and execution evidence are cleared.
+        Editar cualquier límite genera una autoridad nueva por aprobar. La
+        aprobación anterior y su evidencia de ejecución se descartan.
       </p>
       <div className="parameter-grid">
         <label>
-          Authorized recipient
+          Destinatario autorizado
           <input
             type="email"
             value={recipient}
@@ -72,7 +73,7 @@ function ParameterEditorForm({
           />
         </label>
         <label>
-          Maximum cost (USD)
+          Costo máximo (USD)
           <input
             type="number"
             min="0"
@@ -83,7 +84,7 @@ function ParameterEditorForm({
           />
         </label>
         <label>
-          Maximum executions
+          Ejecuciones máximas
           <input
             type="number"
             min="1"
@@ -95,7 +96,7 @@ function ParameterEditorForm({
           />
         </label>
         <label>
-          Expiry (local time)
+          Vencimiento (hora local)
           <input
             type="datetime-local"
             value={expiresAt}
@@ -105,7 +106,7 @@ function ParameterEditorForm({
         </label>
       </div>
       <button className="button-secondary" type="submit" disabled={revising}>
-        {revising ? "Reissuing authority…" : "Apply changes & require approval"}
+        {revising ? "Reemitiendo autoridad…" : "Aplicar cambios y pedir aprobación"}
       </button>
     </form>
   );

@@ -84,6 +84,21 @@ export function MissionControl({
   const approved = contract?.status === "approved";
   const compilerLabel = getCompilerLabel(compiler);
   const compilerDetail = getCompilerDetail(compiler);
+  const canCompile = busy === null && intent.trim().length > 0;
+
+  const compileButtonHint = canCompile
+    ? null
+    : busy !== null
+      ? "Espera a que termine la acción actual."
+      : "Escribe una intención antes de compilar.";
+
+  // Una sola acción primaria por pantalla — Manual de marca §7.2.
+  // La única señal naranja de la pieza se mueve con el paso activo del flujo.
+  const accionPrimaria = !contract
+    ? "compilar"
+    : !approved
+      ? "aprobar"
+      : "ejecutar";
 
   async function compileContract() {
     setBusy("compile");
@@ -101,9 +116,9 @@ export function MissionControl({
       setHistory(EMPTY_HISTORY);
       setAllowedCount(0);
       setBlockedCount(0);
-      setAudit([createAuditItem(0, "Contract compiled", "neutral")]);
+      setAudit([createAuditItem(0, "Contrato compilado", "neutral")]);
     } catch {
-      setError("Contract compilation failed. Check the intent and try again.");
+      setError("No se pudo compilar el contrato. Revisa la intención e inténtalo de nuevo.");
     } finally {
       setBusy(null);
     }
@@ -119,9 +134,9 @@ export function MissionControl({
         await postJson("/api/approve", { contract }),
       );
       setContract(payload.contract);
-      appendAudit("Contract approved", "neutral");
+      appendAudit("Contrato aprobado", "neutral");
     } catch {
-      setError("Contract approval failed. Recompile a valid proposed contract.");
+      setError("No se pudo aprobar el contrato. Compila de nuevo un contrato propuesto válido.");
     } finally {
       setBusy(null);
     }
@@ -143,9 +158,9 @@ export function MissionControl({
       setBlockedCount(0);
       setSuiteResults([]);
       setSelectedScenario(null);
-      appendAudit("Authority parameters revised", "neutral");
+      appendAudit("Parámetros de autoridad revisados", "neutral");
     } catch {
-      setError("Authority revision failed. The existing snapshot remains unchanged.");
+      setError("No se pudo revisar la autoridad. El contrato aprobado sigue intacto.");
     } finally {
       setBusy(null);
     }
@@ -169,18 +184,18 @@ export function MissionControl({
       if (payload.verdict.verdict === "ALLOW") {
         if (payload.nextHistory) setHistory(payload.nextHistory);
         setAllowedCount((count) => count + 1);
-        appendAudit("Execution allowed", "allow");
+        appendAudit("Ejecución permitida", "allow");
       } else {
         setBlockedCount((count) => count + 1);
         appendAudit(
           scenario === "expired"
-            ? "Expired contract blocked"
-            : "Execution denied",
+            ? "Contrato vencido: ejecución prohibida"
+            : "Ejecución prohibida",
           "deny",
         );
       }
     } catch {
-      setError("Evaluation failed. No simulation state was consumed.");
+      setError("La evaluación falló. No se consumió ningún estado de la simulación.");
     } finally {
       setBusy(null);
     }
@@ -238,7 +253,7 @@ export function MissionControl({
       setAllowedCount(allowed);
       setBlockedCount(blocked);
     } catch {
-      setError("Threat suite stopped safely. Completed verdicts remain visible.");
+      setError("La suite se detuvo de forma segura. Los veredictos completados siguen visibles.");
     } finally {
       setBusy(null);
     }
@@ -263,57 +278,59 @@ export function MissionControl({
     setSelectedScenario(null);
     setError(null);
     setBusy(null);
-    setAudit([createAuditItem(0, "Lab reset", "neutral")]);
+    setAudit([createAuditItem(0, "Laboratorio reiniciado", "neutral")]);
   }
 
   return (
     <main className="mission-shell">
       <header className="topbar">
+        {/* Lock-up de primera aparición — Manual de marca §1.7 */}
         <div className="brand-lockup">
           <BrandMark />
           <div>
             <strong>ZELIC Guard</strong>
-            <span>Intent contracts for autonomous systems</span>
+            <span className="brand-respaldo">by LogVox</span>
           </div>
         </div>
         <div className="header-actions">
           <span className="header-badge">OPENAI BUILD WEEK</span>
           {access.kind === "operator" ? (
             <>
-              <span className="header-badge operator-badge">OPERATOR WORKSPACE</span>
+              <span className="header-badge operator-badge">ESPACIO DE OPERADOR</span>
               <span className="operator-identity">{access.label}</span>
               <LogoutButton />
             </>
           ) : (
             <>
-              <span className="header-badge judge-badge">PUBLIC JUDGE SANDBOX</span>
-              <Link className="operator-login-link" href="/login">Operator login</Link>
+              <span className="header-badge judge-badge">SANDBOX PÚBLICO</span>
+              <Link className="operator-login-link" href="/login">Acceso de operador</Link>
             </>
           )}
-          <span className="header-badge simulation-badge">
-            <span aria-hidden="true" /> SIMULATION
+          {/* Estado real declarado — §4.3 y §7.2 */}
+          <span className="header-badge estado-producto">
+            <span aria-hidden="true" /> PROTOTIPO FUNCIONAL
           </span>
           <ThemeToggle />
           <button className="reset-button" type="button" onClick={resetLab}>
             <ResetIcon />
-            Reset Lab
+            Reiniciar laboratorio
           </button>
         </div>
       </header>
 
       <section className="hero-compact" aria-labelledby="hero-title">
         <div>
-          <p className="overline"><span aria-hidden="true" /> RUNTIME AUTHORITY LAYER</p>
-          <h1 id="hero-title">Approve the intent. Not the surprise.</h1>
+          <p className="overline"><span aria-hidden="true" /> CAPA DE AUTORIDAD EN EJECUCIÓN</p>
+          <h1 id="hero-title">Autoriza el alcance. No la sorpresa.</h1>
           <p className="hero-copy">
-            Autonomous systems can plan freely. At execution time, every action
-            must remain inside the authority a human approved.
+            Un agente puede planear libremente. Al ejecutar, cada acción debe
+            permanecer dentro de la autoridad que una persona aprobó.
           </p>
         </div>
-        <div className="proof-chips" aria-label="System guarantees">
-          <span><b>10</b> policy checks</span>
-          <span><b>SHA-256</b> authority</span>
-          <span><b>0</b> external actions</span>
+        <div className="proof-chips" aria-label="Garantías del sistema">
+          <span><b>10</b> reglas verificadas</span>
+          <span><b>SHA-256</b> autoridad</span>
+          <span><b>0</b> acciones externas</span>
         </div>
       </section>
 
@@ -325,8 +342,8 @@ export function MissionControl({
             <div>
               <span className="stage-number">01–02</span>
               <div>
-                <span className="section-kicker">INTENT / AUTHORITY</span>
-                <h2 id="intent-title">Define approved scope</h2>
+                <span className="section-kicker">INTENCIÓN / AUTORIDAD</span>
+                <h2 id="intent-title">Define el alcance aprobado</h2>
               </div>
             </div>
             <span className="mode-badge">
@@ -335,7 +352,7 @@ export function MissionControl({
           </div>
 
           <div className="intent-editor">
-            <label htmlFor="guard-intent">Natural-language intent</label>
+            <label htmlFor="guard-intent">Intención en lenguaje natural</label>
             <textarea
               id="guard-intent"
               value={intent}
@@ -343,17 +360,25 @@ export function MissionControl({
               spellCheck="false"
             />
             <div className="intent-meta">
-              <span>Seeded invoice scenario</span>
+              <span>Escenario de factura sembrado</span>
               <span>{compilerDetail}</span>
             </div>
             <button
               className="button-primary"
               type="button"
+              data-activa={accionPrimaria === "compilar"}
               onClick={compileContract}
-              disabled={busy !== null || !intent.trim()}
+              disabled={!canCompile}
+              title={compileButtonHint ?? "Compilar contrato"}
+              aria-label="Compilar contrato"
             >
-              {busy === "compile" ? <LoadingLabel label="Compiling contract" /> : "Compile contract"}
+              {busy === "compile" ? <LoadingLabel label="Compilando contrato" /> : "Compilar contrato"}
             </button>
+            {!canCompile ? (
+              <p className="button-state-note" role="status" aria-live="polite">
+                {compileButtonHint}
+              </p>
+            ) : null}
             <p className="simulation-disclosure">
               <ShieldMini />
               {SIMULATION_DISCLOSURE}
@@ -364,6 +389,7 @@ export function MissionControl({
             contract={contract}
             compiler={compiler}
             approving={busy === "approve"}
+            esAccionPrimaria={accionPrimaria === "aprobar"}
             onApprove={approveCurrentContract}
           />
           <ContractParameterEditor
@@ -382,6 +408,7 @@ export function MissionControl({
           blockedCount={blockedCount}
           suiteRunning={busy === "suite"}
           suiteResults={suiteResults}
+          esAccionPrimaria={accionPrimaria === "ejecutar"}
           onRun={runScenario}
           onRunSuite={runThreatSuite}
         />
@@ -405,24 +432,24 @@ export function MissionControl({
 function getCompilerLabel(
   compiler: CompileIntentResponse["compiler"] | null,
 ): string {
-  if (compiler?.provider === "openai") return "GPT-5.6 live";
-  if (compiler?.fallbackReason) return "Deterministic fallback";
-  return "GPT-5.6 preferred";
+  if (compiler?.provider === "openai") return "GPT-5.6 en vivo";
+  if (compiler?.fallbackReason) return "Respaldo determinista";
+  return "GPT-5.6 preferido";
 }
 
 function getCompilerDetail(
   compiler: CompileIntentResponse["compiler"] | null,
 ): string {
   if (compiler?.provider === "openai") {
-    return `${compiler.model ?? "GPT-5.6"} compiled this authority on the server`;
+    return `${compiler.model ?? "GPT-5.6"} compiló esta autoridad en el servidor`;
   }
   if (compiler?.fallbackReason === "missing_api_key") {
-    return "OPENAI_API_KEY not configured · deterministic fallback used";
+    return "OPENAI_API_KEY sin configurar · se usó el respaldo determinista";
   }
   if (compiler?.fallbackReason === "provider_error") {
-    return "OpenAI provider unavailable · deterministic fallback used";
+    return "Proveedor OpenAI no disponible · se usó el respaldo determinista";
   }
-  return "Server chooses GPT-5.6 when configured · offline fallback included";
+  return "El servidor usa GPT-5.6 cuando está configurado · incluye respaldo sin conexión";
 }
 
 function WorkflowRail({
@@ -432,22 +459,28 @@ function WorkflowRail({
   readonly contract: IntentContract | null;
   readonly verdict: ExecutionVerdict | null;
 }) {
+  // Autoridad en interfaz: Permitido · Requiere aprobación · Prohibido — §4.3
   const steps = [
-    { label: "Intent", detail: contract ? "Compiled" : "Ready", complete: Boolean(contract) },
+    { label: "Intención", detail: contract ? "Compilada" : "Lista", complete: Boolean(contract) },
     {
-      label: "Authority",
-      detail: contract?.status === "approved" ? "Approved" : contract ? "Proposed" : "Locked",
+      label: "Autoridad",
+      detail:
+        contract?.status === "approved"
+          ? "Aprobada"
+          : contract
+            ? "Requiere aprobación"
+            : "Bloqueada",
       complete: contract?.status === "approved",
     },
     {
-      label: "Verdict",
-      detail: verdict?.verdict ?? "Pending",
+      label: "Veredicto",
+      detail: verdict ? (verdict.verdict === "ALLOW" ? "Permitido" : "Prohibido") : "Pendiente",
       complete: Boolean(verdict),
     },
   ];
 
   return (
-    <nav className="workflow-rail" aria-label="Contract workflow">
+    <nav className="workflow-rail" aria-label="Flujo del contrato">
       <ol>
         {steps.map((step, index) => (
           <li
@@ -468,16 +501,19 @@ function LoadingLabel({ label }: { readonly label: string }) {
   return <><span className="spinner" aria-hidden="true" />{label}…</>;
 }
 
+/* Iconografía LogVox §6.2 — retícula 24×24, trazo 2, remates rectos,
+   uniones en ángulo vivo, sin relleno. lv-evolucion y lv-autoridad son los
+   conceptos oficiales del set (04-recursos/iconos-mono/). */
 function ResetIcon() {
-  return <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 5V2m0 0h-3m3 0-2.2 2.2A5.5 5.5 0 1 0 13.5 9" /></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 8V3h-5 M19 3l-3.5 3.5A7 7 0 1 0 19 13" /></svg>;
 }
 
 function ShieldMini() {
-  return <svg viewBox="0 0 16 18" aria-hidden="true"><path d="M8 1 14 3.3v4.5c0 3.8-2.4 6.7-6 8.2-3.6-1.5-6-4.4-6-8.2V3.3L8 1Z" /></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 19 6v5.5c0 4-3 7-7 9-4-2-7-5-7-9V6Z M9 12l2.2 2.2L15.5 10" /></svg>;
 }
 
 function DenyMini() {
-  return <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8m0-8-8 8" /></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" /></svg>;
 }
 
 async function postJson(path: string, body: unknown): Promise<unknown> {

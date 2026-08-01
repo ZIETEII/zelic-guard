@@ -15,10 +15,10 @@ describe("ThemeToggle", () => {
     const user = userEvent.setup();
     render(<ThemeToggle />);
 
-    await user.click(await screen.findByRole("button", { name: "Use light mode" }));
+    await user.click(await screen.findByRole("button", { name: "Usar modo claro" }));
 
     expect(document.documentElement.dataset.theme).toBe("light");
     expect(window.localStorage.getItem("zelic-guard-theme")).toBe("light");
-    expect(screen.getByRole("button", { name: "Use dark mode" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Usar modo oscuro" })).toBeInTheDocument();
   });
 });

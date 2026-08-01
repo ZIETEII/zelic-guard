@@ -887,3 +887,37 @@ npm run test:run -- tests/unit/guard/revise-contract.test.ts tests/integration/a
 - **Full GREEN:** `npm run lint`, `npm run typecheck`, `npm run test:run`, and `npm run build` all exited 0. Vitest passed 27 files and 121 tests.
 
 Local real-browser acceptance at 1440×960 compiled and approved the seeded simulation, executed one safe run, then revised the recipient and cost. The application visibly returned to proposed authority, disabled **Safe run**, reset `Allowed 1 · Blocked 0` to `Allowed 0 · Blocked 0`, and recorded `Authority parameters revised`. Switching to light mode persisted the preference, applied `data-theme="light"`, retained contrast, and produced no horizontal overflow. At 390×844, both theme directions, the parameter editor, and the compiled authority remained usable with `scrollWidth === innerWidth === 390`; browser console logs contained no warnings or errors.
+
+### T065 LogVox brand system
+
+Presentation-layer work: the policy engine, its rule identifiers, reason codes, and API messages were left untouched, so no domain RED cycle applies. Spanish rule copy lives in a presentation map inside `execution-gate.tsx`, keeping the engine output stable for integrators.
+
+Applied from **LogVox Manual de marca 1.0** (Brand OS 1.2), sourced from the master package:
+
+- **Lock-up (§1.7):** `ZELIC Guard` over `by LogVox`. ZELIC Guard is presented as a product capability, never as an independent brand.
+- **Monogram (§3.1):** master SVG geometry reproduced unmodified; only the V body alternates between the two official colour versions — white on dark, Graphite on light (§7.5).
+- **Colour (§4.1–4.4):** official neutral and orange ramps, Obsidian canvas, Graphite surfaces. Interface authority states use `Permitido`, `Requiere aprobación`, `Prohibido` (§4.3).
+- **One orange signal (§4.4) and one primary action (§7.2):** the single Signal Orange fill follows the active workflow step — compile, then approve, then execute — driven by `data-activa`. Verified in-browser: exactly one orange fill at every stage.
+- **Type (§5):** Space Grotesk (display/UI), Space Mono (data, state, code, labels), Inter Light (body). Labels are uppercase mono at +13% tracking; negative tracking only above 34 px; tabular numerals in dashboards.
+- **Product tokens (§7.1):** container radius capped at 6 px, motion at 120/180/240 ms on `cubic-bezier(.2,0,0,1)`, no shadows in dark mode, hierarchy by luminance plus a 1 px border.
+- **Focus (§7.2):** 2 px Signal Orange ring at 2 px offset on every control.
+- **La Traza (§6.1):** hero field derived from the master banner and rendered fully passive in Steel at 30%, because the piece's active orange signal is the primary button.
+- **Declared state (§4.3, §7.2, §9.2):** the product reports `PROTOTIPO FUNCIONAL` — built and verifiable, without full real operation. The simulation disclosure remains explicit.
+
+Two defects were found and fixed during verification:
+
+1. **Contrast:** the light-mode primary fill used Orange 600 with white 13 px text at 3.59:1, failing AA. The manual reserves Orange 600 for non-textual graphics (§4.2); the fill now uses Orange 700 at 5.19:1.
+2. **Hydration:** pre-existing. `ThemeToggle` wrote `data-theme` onto the same `<html>` React hydrates, and the server emitted no such attribute, producing a hydration-mismatch console error. The server now renders `data-theme="dark"` with `suppressHydrationWarning`.
+
+`vitest.config.ts` raises `testTimeout` to 20 s: the UI integration files chain more than ten `userEvent` interactions with full jsdom re-render, and the 5 s default produced timing — not functional — failures when all 27 files ran in parallel.
+
+Verification commands, all exited 0:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:run
+npm run build
+```
+
+Vitest passed 27 files and 121 tests. Real-browser acceptance at 1440×900 and 375×812 ran the full compile → approve → threat suite path in both themes, reaching `Permitidas 1 · Prohibidas 4` with five stacked results, `scrollWidth === clientWidth` at both widths, and empty console scans. An automated contrast sweep over every visible text node reported 0 AA failures in dark and light; disabled controls are exempt under WCAG 2.2 (1.4.3).

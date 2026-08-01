@@ -1,35 +1,37 @@
+import { INVOICE_INTENT } from "@/lib/guard/demo-seed";
+
 const ENDPOINTS = [
   {
     path: "POST /api/compile",
-    detail: "Natural language → validated intent contract",
+    detail: "Lenguaje natural → contrato de intención validado",
   },
   {
     path: "POST /api/approve",
-    detail: "Proposed contract → fingerprinted authority",
+    detail: "Contrato propuesto → autoridad con huella",
   },
   {
     path: "POST /api/evaluate",
-    detail: "Attempt + history → ALLOW or DENY evidence",
+    detail: "Intento + historial → evidencia ALLOW o DENY",
   },
 ] as const;
 
 const QUICKSTART = `curl -X POST \\
   https://zelic-guard-build-week.vercel.app/api/compile \\
   -H 'content-type: application/json' \\
-  -d '{"intent":"Send invoice INV-2048 to finance@northstar.test once, for no more than $0.25, before 18:00.","mode":"auto"}'`;
+  -d '${JSON.stringify({ intent: INVOICE_INTENT, mode: "auto" })}'`;
 
 export function DeveloperQuickstart() {
   return (
     <section className="developer-panel" aria-labelledby="developer-title">
       <div className="developer-heading">
         <div>
-          <span className="section-kicker">DEVELOPER INTEGRATION</span>
-          <h2 id="developer-title">Integrate in three requests</h2>
+          <span className="section-kicker">INTEGRACIÓN</span>
+          <h2 id="developer-title">Conéctalo en tres peticiones</h2>
         </div>
-        <div className="developer-signals" aria-label="API guarantees">
-          <span>ZOD VALIDATED</span>
-          <span>SERVER ENFORCED</span>
-          <span>FAIL CLOSED</span>
+        <div className="developer-signals" aria-label="Garantías de la API">
+          <span>VALIDADO CON ZOD</span>
+          <span>APLICADO EN SERVIDOR</span>
+          <span>CIERRA ANTE FALLA</span>
         </div>
       </div>
 
@@ -48,13 +50,13 @@ export function DeveloperQuickstart() {
 
         <div className="quickstart-code">
           <div>
-            <span>QUICKSTART / LIVE API</span>
+            <span>INICIO RÁPIDO / API EN VIVO</span>
             <a
               href="https://github.com/ZIETEII/zelic-guard"
               target="_blank"
               rel="noreferrer"
             >
-              View source
+              Ver código
             </a>
           </div>
           <pre><code>{QUICKSTART}</code></pre>

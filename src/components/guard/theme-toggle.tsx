@@ -26,15 +26,16 @@ export function ThemeToggle() {
     window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
   }
 
-  const switchingTo = theme === "dark" ? "light" : "dark";
+  // Modo claro: lectura sostenida, no alternativa estética — §7.5
+  const switchingTo = theme === "dark" ? "claro" : "oscuro";
 
   return (
     <button
       className="theme-toggle"
       type="button"
       onClick={toggleTheme}
-      aria-label={`Use ${switchingTo} mode`}
-      title={`Use ${switchingTo} mode`}
+      aria-label={`Usar modo ${switchingTo}`}
+      title={`Usar modo ${switchingTo}`}
     >
       {theme === "dark" ? <SunIcon /> : <MoonIcon />}
       <span>{switchingTo}</span>
@@ -60,10 +61,11 @@ function getServerThemeSnapshot(): Theme {
   return "dark";
 }
 
+/* Iconografía LogVox §6.2 — retícula 24×24, trazo 2, remates rectos. */
 function SunIcon() {
-  return <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" /><path d="M8 1v2m0 10v2M1 8h2m10 0h2m-12-5 1.4 1.4m8.2 8.2L14 14m0-11-1.4 1.4m-8.2 8.2L3 14" /></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M5 5l1.8 1.8M17.2 17.2 19 19M19 5l-1.8 1.8M6.8 17.2 5 19" /></svg>;
 }
 
 function MoonIcon() {
-  return <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.4 10.2A5.8 5.8 0 0 1 5.8 2.6 6 6 0 1 0 13.4 10.2Z" /></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.2A8.7 8.7 0 0 1 8.8 4 9 9 0 1 0 20 15.2Z" /></svg>;
 }

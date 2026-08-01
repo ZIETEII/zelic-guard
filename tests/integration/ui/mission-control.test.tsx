@@ -89,30 +89,30 @@ describe("ZELIC Guard mission control", () => {
     installGuardApiMock();
     render(<MissionControl />);
 
-    expect(screen.getByRole("textbox", { name: /intent/i })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Approve contract" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Safe run" })).toBeDisabled();
+    expect(screen.getByRole("textbox", { name: /Intención/i })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Aprobar contrato" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Ejecución válida" })).toBeDisabled();
     expect(
-      screen.getByText("Simulation only — no email or payment is sent."),
+      screen.getByText("Simulación. No se envía ningún correo ni pago."),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Compile contract" }));
+    await user.click(screen.getByRole("button", { name: "Compilar contrato" }));
 
-    expect(await screen.findByText("PROPOSED")).toBeInTheDocument();
+    expect(await screen.findByText("REQUIERE APROBACIÓN")).toBeInTheDocument();
     expect(screen.getByText("send_invoice")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Approve contract" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Aprobar contrato" })).toBeEnabled();
 
-    await user.click(screen.getByRole("button", { name: "Approve contract" }));
+    await user.click(screen.getByRole("button", { name: "Aprobar contrato" }));
 
-    expect(await screen.findByText("APPROVED")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Safe run" })).toBeEnabled();
+    expect(await screen.findByText("APROBADO")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ejecución válida" })).toBeEnabled();
 
-    await user.click(screen.getByRole("button", { name: "Safe run" }));
+    await user.click(screen.getByRole("button", { name: "Ejecución válida" }));
 
     const allowResult = await screen.findByRole("region", {
-      name: "Execution verdict",
+      name: "Veredicto de ejecución",
     });
-    expect(within(allowResult).getByRole("heading", { name: "ALLOW" })).toBeInTheDocument();
+    expect(within(allowResult).getByRole("heading", { name: "PERMITIDO" })).toBeInTheDocument();
     expect(within(allowResult).getByText("ALL_RULES_PASSED")).toBeInTheDocument();
     expect(within(allowResult).getAllByText("PASS")).toHaveLength(10);
 
@@ -122,17 +122,17 @@ describe("ZELIC Guard mission control", () => {
       expect(within(allowResult).queryByText(failureCode)).not.toBeInTheDocument();
     }
 
-    await user.click(screen.getByRole("button", { name: "Recipient drift" }));
+    await user.click(screen.getByRole("button", { name: "Destinatario no autorizado" }));
 
     expect(
-      await within(allowResult).findByRole("heading", { name: "DENY" }),
+      await within(allowResult).findByRole("heading", { name: "PROHIBIDO" }),
     ).toBeInTheDocument();
     expect(
       within(allowResult).getAllByText("RECIPIENT_NOT_ALLOWED").length,
     ).toBeGreaterThan(0);
 
     const failedRecipientRule = within(allowResult)
-      .getByText("Fail: recipient allowed")
+      .getByText("Falla: destinatario autorizado")
       .closest("li");
     expect(failedRecipientRule).not.toBeNull();
     expect(
@@ -147,7 +147,7 @@ describe("ZELIC Guard mission control", () => {
     const fetchMock = installGuardApiMock();
     render(<MissionControl />);
 
-    await user.click(screen.getByRole("button", { name: "Compile contract" }));
+    await user.click(screen.getByRole("button", { name: "Compilar contrato" }));
 
     const compileRequest = fetchMock.mock.calls.find(
       ([path]) => String(path) === "/api/compile",
@@ -156,8 +156,8 @@ describe("ZELIC Guard mission control", () => {
       intent: expect.any(String),
       mode: "auto",
     });
-    expect(await screen.findByText("Deterministic fallback")).toBeInTheDocument();
-    expect(screen.getByText(/OPENAI_API_KEY not configured/i)).toBeInTheDocument();
+    expect(await screen.findByText("Respaldo determinista")).toBeInTheDocument();
+    expect(screen.getByText(/OPENAI_API_KEY sin configurar/i)).toBeInTheDocument();
   });
 
   it("runs the complete adversarial suite and proves one allow with four denials", async () => {
@@ -166,32 +166,32 @@ describe("ZELIC Guard mission control", () => {
     render(<MissionControl />);
 
     expect(
-      screen.getByRole("button", { name: "Run full threat suite" }),
+      screen.getByRole("button", { name: "Ejecutar la suite completa" }),
     ).toBeDisabled();
 
-    await user.click(screen.getByRole("button", { name: "Compile contract" }));
-    await screen.findByText("PROPOSED");
-    await user.click(screen.getByRole("button", { name: "Approve contract" }));
-    await screen.findByText("APPROVED");
+    await user.click(screen.getByRole("button", { name: "Compilar contrato" }));
+    await screen.findByText("REQUIERE APROBACIÓN");
+    await user.click(screen.getByRole("button", { name: "Aprobar contrato" }));
+    await screen.findByText("APROBADO");
     await user.click(
-      screen.getByRole("button", { name: "Run full threat suite" }),
+      screen.getByRole("button", { name: "Ejecutar la suite completa" }),
     );
 
     const report = await screen.findByRole("region", {
-      name: "Threat suite report",
+      name: "Informe de la suite",
     });
-    expect(within(report).getByText("Threat suite complete")).toBeInTheDocument();
+    expect(within(report).getByText("Suite completa")).toBeInTheDocument();
     expect(within(report).getAllByText("DENY")).toHaveLength(4);
     expect(within(report).getAllByText("ALLOW")).toHaveLength(1);
-    expect(screen.getByText("Allowed 1 · Blocked 4")).toBeInTheDocument();
-    expect(screen.getByText("Threat suite: 5/5 boundaries verified")).toBeInTheDocument();
+    expect(screen.getByText("Permitidas 1 · Prohibidas 4")).toBeInTheDocument();
+    expect(screen.getByText("Suite: 5/5 límites verificados")).toBeInTheDocument();
   });
 
   it("labels the resettable audit trail as deterministic evidence", () => {
     render(<MissionControl />);
 
-    expect(screen.getByText("DETERMINISTIC EVIDENCE")).toBeInTheDocument();
-    expect(screen.queryByText("IMMUTABLE EVIDENCE")).not.toBeInTheDocument();
+    expect(screen.getByText("EVIDENCIA DETERMINISTA")).toBeInTheDocument();
+    expect(screen.queryByText("EVIDENCIA INMUTABLE")).not.toBeInTheDocument();
   });
 
   it("reissues edited parameters and clears the previous approval evidence", async () => {
@@ -199,17 +199,17 @@ describe("ZELIC Guard mission control", () => {
     const fetchMock = installGuardApiMock();
     render(<MissionControl />);
 
-    await user.click(screen.getByRole("button", { name: "Compile contract" }));
-    await user.click(await screen.findByRole("button", { name: "Approve contract" }));
-    await user.click(await screen.findByRole("button", { name: "Safe run" }));
-    expect(await screen.findByText("Allowed 1 · Blocked 0")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Compilar contrato" }));
+    await user.click(await screen.findByRole("button", { name: "Aprobar contrato" }));
+    await user.click(await screen.findByRole("button", { name: "Ejecución válida" }));
+    expect(await screen.findByText("Permitidas 1 · Prohibidas 0")).toBeInTheDocument();
 
-    await user.clear(screen.getByLabelText("Authorized recipient"));
-    await user.type(screen.getByLabelText("Authorized recipient"), "ops@northstar.test");
-    await user.clear(screen.getByLabelText("Maximum cost (USD)"));
-    await user.type(screen.getByLabelText("Maximum cost (USD)"), "0.5");
+    await user.clear(screen.getByLabelText("Destinatario autorizado"));
+    await user.type(screen.getByLabelText("Destinatario autorizado"), "ops@northstar.test");
+    await user.clear(screen.getByLabelText("Costo máximo (USD)"));
+    await user.type(screen.getByLabelText("Costo máximo (USD)"), "0.5");
     await user.click(
-      screen.getByRole("button", { name: "Apply changes & require approval" }),
+      screen.getByRole("button", { name: "Aplicar cambios y pedir aprobación" }),
     );
 
     const revisionRequest = fetchMock.mock.calls.find(
@@ -221,26 +221,26 @@ describe("ZELIC Guard mission control", () => {
         maxCost: 0.5,
       },
     });
-    expect(await screen.findByText("Authority parameters revised")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Safe run" })).toBeDisabled();
-    expect(screen.getByText("Allowed 0 · Blocked 0")).toBeInTheDocument();
+    expect(await screen.findByText("Parámetros de autoridad revisados")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ejecución válida" })).toBeDisabled();
+    expect(screen.getByText("Permitidas 0 · Prohibidas 0")).toBeInTheDocument();
   });
 
   it("presents the server API path and public judge sandbox", () => {
     render(<MissionControl />);
 
-    expect(screen.getByText("PUBLIC JUDGE SANDBOX")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Operator login" })).toHaveAttribute(
+    expect(screen.getByText("SANDBOX PÚBLICO")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Acceso de operador" })).toHaveAttribute(
       "href",
       "/login",
     );
     expect(
-      screen.getByRole("heading", { name: "Integrate in three requests" }),
+      screen.getByRole("heading", { name: "Conéctalo en tres peticiones" }),
     ).toBeInTheDocument();
     expect(screen.getByText("POST /api/compile")).toBeInTheDocument();
     expect(screen.getByText("POST /api/approve")).toBeInTheDocument();
     expect(screen.getByText("POST /api/evaluate")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "View source" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Ver código" })).toHaveAttribute(
       "href",
       "https://github.com/ZIETEII/zelic-guard",
     );
@@ -253,10 +253,10 @@ describe("ZELIC Guard mission control", () => {
       />,
     );
 
-    expect(screen.getByText("OPERATOR WORKSPACE")).toBeInTheDocument();
+    expect(screen.getByText("ESPACIO DE OPERADOR")).toBeInTheDocument();
     expect(screen.getByText("Build Week Operator")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
-    expect(screen.queryByText("PUBLIC JUDGE SANDBOX")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeInTheDocument();
+    expect(screen.queryByText("SANDBOX PÚBLICO")).not.toBeInTheDocument();
   });
 
   it("shows cost, replay, expiry, counters, JSON, audit order, and pristine reset", async () => {
@@ -264,42 +264,42 @@ describe("ZELIC Guard mission control", () => {
     installGuardApiMock();
     render(<MissionControl />);
 
-    await user.click(screen.getByRole("button", { name: "Compile contract" }));
-    await screen.findByText("PROPOSED");
-    await user.click(screen.getByRole("button", { name: "Approve contract" }));
-    await screen.findByText("APPROVED");
+    await user.click(screen.getByRole("button", { name: "Compilar contrato" }));
+    await screen.findByText("REQUIERE APROBACIÓN");
+    await user.click(screen.getByRole("button", { name: "Aprobar contrato" }));
+    await screen.findByText("APROBADO");
 
-    await user.click(screen.getByRole("button", { name: "Cost overrun" }));
+    await user.click(screen.getByRole("button", { name: "Costo sobre el límite" }));
     expect((await screen.findAllByText("COST_LIMIT_EXCEEDED")).length).toBeGreaterThan(0);
 
-    await user.click(screen.getByRole("button", { name: "Replay" }));
+    await user.click(screen.getByRole("button", { name: "Reintento de ejecución" }));
     expect((await screen.findAllByText("REPLAY_DETECTED")).length).toBeGreaterThan(0);
     expect(screen.getAllByText("MAX_RUNS_EXCEEDED").length).toBeGreaterThan(0);
 
-    await user.click(screen.getByRole("button", { name: "Expired contract" }));
+    await user.click(screen.getByRole("button", { name: "Contrato vencido" }));
     expect((await screen.findAllByText("CONTRACT_EXPIRED")).length).toBeGreaterThan(0);
-    expect(screen.getByText("Expired window")).toBeInTheDocument();
+    expect(screen.getByText("Ventana vencida")).toBeInTheDocument();
 
-    const result = screen.getByRole("region", { name: "Execution verdict" });
+    const result = screen.getByRole("region", { name: "Veredicto de ejecución" });
     expect(within(result).getAllByRole("listitem")).toHaveLength(10);
-    expect(screen.getByText("Allowed 0 · Blocked 3")).toBeInTheDocument();
+    expect(screen.getByText("Permitidas 0 · Prohibidas 3")).toBeInTheDocument();
 
-    await user.click(screen.getByText("Authority JSON"));
+    await user.click(screen.getByText("Autoridad en JSON"));
     expect(screen.getByText(/"status": "approved"/)).toBeInTheDocument();
-    expect(screen.getByText("Contract compiled").closest("li")).toHaveTextContent(
-      /0001.*Contract compiled/,
+    expect(screen.getByText("Contrato compilado").closest("li")).toHaveTextContent(
+      /0001.*Contrato compilado/,
     );
-    expect(screen.getByText("Expired contract blocked").closest("li")).toHaveTextContent(
-      /0005.*Expired contract blocked/,
+    expect(screen.getByText("Contrato vencido: ejecución prohibida").closest("li")).toHaveTextContent(
+      /0005.*Contrato vencido: ejecución prohibida/,
     );
 
-    await user.click(screen.getByRole("button", { name: "Reset Lab" }));
+    await user.click(screen.getByRole("button", { name: "Reiniciar laboratorio" }));
 
-    expect(screen.getByText("No contract compiled.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Safe run" })).toBeDisabled();
-    expect(screen.getByText("Allowed 0 · Blocked 0")).toBeInTheDocument();
-    expect(screen.getByText("Lab reset").closest("li")).toHaveTextContent(
-      /0001.*Lab reset/,
+    expect(screen.getByText("Ningún contrato compilado.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ejecución válida" })).toBeDisabled();
+    expect(screen.getByText("Permitidas 0 · Prohibidas 0")).toBeInTheDocument();
+    expect(screen.getByText("Laboratorio reiniciado").closest("li")).toHaveTextContent(
+      /0001.*Laboratorio reiniciado/,
     );
   });
 
@@ -308,15 +308,15 @@ describe("ZELIC Guard mission control", () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
     render(<MissionControl />);
 
-    await user.click(screen.getByRole("button", { name: "Compile contract" }));
+    await user.click(screen.getByRole("button", { name: "Compilar contrato" }));
 
     expect(
-      await screen.findByText("Contract compilation failed. Check the intent and try again."),
+      await screen.findByText("No se pudo compilar el contrato. Revisa la intención e inténtalo de nuevo."),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Safe run" })).toBeDisabled();
-    expect(screen.queryByText(/email sent|payment sent|message delivered/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ejecución válida" })).toBeDisabled();
+    expect(screen.queryByText(/email sent|payment sent|message delivered|correo enviado|pago enviado|mensaje entregado/i)).not.toBeInTheDocument();
     expect(
-      screen.getByText("Simulation only — no email or payment is sent."),
+      screen.getByText("Simulación. No se envía ningún correo ni pago."),
     ).toBeInTheDocument();
   });
 });

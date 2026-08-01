@@ -1,17 +1,17 @@
 import type { ExecutionAttempt, IntentContract } from "./types";
 
 export const INVOICE_INTENT =
-  "Send invoice INV-2048 to finance@northstar.test once, for no more than $0.25, before 18:00.";
+  "Envía la factura INV-2048 a finance@northstar.test una sola vez, por máximo $0.25, antes de las 18:00.";
 
 export const SIMULATION_DISCLOSURE =
-  "Simulation only — no email or payment is sent.";
+  "Simulación. No se envía ningún correo ni pago.";
 
 export const SCENARIOS = [
-  { id: "safe", label: "Safe run", detail: "Exact approved authority" },
-  { id: "recipient", label: "Recipient drift", detail: "Unapproved recipient" },
-  { id: "cost", label: "Cost overrun", detail: "Requests $0.26" },
-  { id: "replay", label: "Replay", detail: "Reuses an execution ID" },
-  { id: "expired", label: "Expired contract", detail: "Runs after expiry" },
+  { id: "safe", label: "Ejecución válida", detail: "Dentro de la autoridad aprobada" },
+  { id: "recipient", label: "Destinatario no autorizado", detail: "Cambia el destinatario aprobado" },
+  { id: "cost", label: "Costo sobre el límite", detail: "Solicita $0.26" },
+  { id: "replay", label: "Reintento de ejecución", detail: "Reutiliza un ID ya consumido" },
+  { id: "expired", label: "Contrato vencido", detail: "Ejecuta fuera de la ventana" },
 ] as const;
 
 export type ScenarioId = (typeof SCENARIOS)[number]["id"];

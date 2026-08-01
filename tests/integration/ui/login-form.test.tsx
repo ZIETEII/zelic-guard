@@ -35,17 +35,17 @@ describe("operator login form", () => {
     render(<LoginForm />);
 
     expect(
-      screen.getByRole("heading", { name: "Operator sign in" }),
+      screen.getByRole("heading", { name: "Entrar como operador" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Open public sandbox" }),
+      screen.getByRole("link", { name: "Abrir el sandbox público" }),
     ).toHaveAttribute("href", "/");
 
-    await user.click(screen.getByRole("button", { name: "Use demo credentials" }));
-    expect(screen.getByLabelText("Operator email")).toHaveValue(DEMO_OPERATOR_EMAIL);
-    expect(screen.getByLabelText("Password")).toHaveValue(DEMO_OPERATOR_PASSWORD);
+    await user.click(screen.getByRole("button", { name: "Usar credenciales de demo" }));
+    expect(screen.getByLabelText("Correo del operador")).toHaveValue(DEMO_OPERATOR_EMAIL);
+    expect(screen.getByLabelText("Contraseña")).toHaveValue(DEMO_OPERATOR_PASSWORD);
 
-    await user.click(screen.getByRole("button", { name: "Sign in to workspace" }));
+    await user.click(screen.getByRole("button", { name: "Entrar al espacio de operador" }));
 
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/auth/login",
@@ -73,9 +73,9 @@ describe("operator login form", () => {
     );
     render(<LoginForm />);
 
-    await user.type(screen.getByLabelText("Operator email"), "judge@zelic.guard");
-    await user.type(screen.getByLabelText("Password"), "Incorrect!2026");
-    await user.click(screen.getByRole("button", { name: "Sign in to workspace" }));
+    await user.type(screen.getByLabelText("Correo del operador"), "judge@zelic.guard");
+    await user.type(screen.getByLabelText("Contraseña"), "Incorrect!2026");
+    await user.click(screen.getByRole("button", { name: "Entrar al espacio de operador" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Invalid credentials.",

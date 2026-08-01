@@ -33,7 +33,7 @@ export function LoginForm() {
       if (!response.ok) {
         const failure = authErrorSchema.safeParse(body);
         setError(
-          failure.success ? failure.data.error : "Sign in failed safely.",
+          failure.success ? failure.data.error : "El acceso falló de forma segura.",
         );
         return;
       }
@@ -42,7 +42,7 @@ export function LoginForm() {
       router.push(success.redirectTo);
       router.refresh();
     } catch {
-      setError("Sign in failed safely. Try again.");
+      setError("El acceso falló de forma segura. Inténtalo de nuevo.");
     } finally {
       setPending(false);
     }
@@ -57,15 +57,15 @@ export function LoginForm() {
   return (
     <section className="login-card" aria-labelledby="login-title">
       <div className="login-card-heading">
-        <span className="section-kicker">SECURE OPERATOR ACCESS</span>
-        <h2 id="login-title">Operator sign in</h2>
+        <span className="section-kicker">ACCESO VERIFICADO</span>
+        <h2 id="login-title">Entrar como operador</h2>
         <p>
-          Enter the protected workspace without changing the public judge path.
+          Abre el espacio protegido sin alterar el recorrido público del jurado.
         </p>
       </div>
 
       <form className="login-form" onSubmit={submitLogin}>
-        <label htmlFor="operator-email">Operator email</label>
+        <label htmlFor="operator-email">Correo del operador</label>
         <input
           id="operator-email"
           name="email"
@@ -76,7 +76,7 @@ export function LoginForm() {
           required
         />
 
-        <label htmlFor="operator-password">Password</label>
+        <label htmlFor="operator-password">Contraseña</label>
         <input
           id="operator-password"
           name="password"
@@ -89,29 +89,31 @@ export function LoginForm() {
           required
         />
 
+        {/* Única acción primaria de esta pantalla — §7.2 */}
         <button
           className="button-primary login-submit"
           type="submit"
+          data-activa="true"
           disabled={pending}
         >
-          {pending ? "Verifying operator…" : "Sign in to workspace"}
+          {pending ? "Verificando operador…" : "Entrar al espacio de operador"}
         </button>
       </form>
 
       <div className="demo-access-box">
         <div>
-          <span>JUDGE-SAFE DEMO ACCOUNT</span>
-          <p>Public credentials unlock simulation data only.</p>
+          <span>CUENTA DE DEMOSTRACIÓN</span>
+          <p>Estas credenciales públicas solo abren datos de simulación.</p>
         </div>
         <button type="button" onClick={useDemoCredentials} disabled={pending}>
-          Use demo credentials
+          Usar credenciales de demo
         </button>
       </div>
 
       {error ? <p className="login-error" role="alert">{error}</p> : null}
 
       <Link className="public-sandbox-link" href="/">
-        Open public sandbox
+        Abrir el sandbox público
       </Link>
     </section>
   );
