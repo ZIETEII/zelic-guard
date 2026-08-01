@@ -921,3 +921,30 @@ npm run build
 ```
 
 Vitest passed 27 files and 121 tests. Real-browser acceptance at 1440×900 and 375×812 ran the full compile → approve → threat suite path in both themes, reaching `Permitidas 1 · Prohibidas 4` with five stacked results, `scrollWidth === clientWidth` at both widths, and empty console scans. An automated contrast sweep over every visible text node reported 0 AA failures in dark and light; disabled controls are exempt under WCAG 2.2 (1.4.3).
+
+### T065 preview deployment
+
+Deployed 2026-08-01 as a **preview**, deliberately not production, so the
+canonical Build Week alias keeps serving the delivered English build while the
+LogVox rebrand is reviewed.
+
+- Deployment: `dpl_H63aGojGtwRjm4Hy5x4RSWKtkv8h`
+- Preview URL: `https://zelic-guard-build-week-h3ap9651h-queenietv10-8161s-projects.vercel.app`
+- `readyState: READY`, `target: null` — the null target is what confirms it is not production.
+
+Commits `b443f6e`, `6eadbd0` and `43e5d83` were pushed to
+`origin/codex/revisable-authority-theme` without amending or rewriting history;
+the scaffold commit `c2d047b` remains reachable.
+
+Both endpoints were checked immediately after the deploy:
+
+- Production `https://zelic-guard-build-week.vercel.app/` returned HTTP 200 and
+  still serves `<title>ZELIC Guard — Intent Contracts for AI Agents</title>`, the
+  pre-rebrand English build. Untouched, as intended.
+- The preview returns HTTP 302 to `vercel.com/sso-api`. Vercel Deployment
+  Protection is enabled on this project, so the preview is reachable only with an
+  authenticated Vercel session and is not publicly accessible. No credentials
+  were handled to verify it.
+
+Promotion to production is a separate, explicit step (`vercel deploy --prod`) and
+was not performed.
