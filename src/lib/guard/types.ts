@@ -5,6 +5,7 @@ import type {
   auditEventKindSchema,
   auditEventSchema,
   contractConstraintsSchema,
+  contractRevisionPatchSchema,
   contractStatusSchema,
   executionVerdictSchema,
   executionAttemptSchema,
@@ -15,6 +16,7 @@ import type {
 } from "./schemas";
 
 export type ContractConstraints = z.infer<typeof contractConstraintsSchema>;
+export type ContractRevisionPatch = z.infer<typeof contractRevisionPatchSchema>;
 export type ContractStatus = z.infer<typeof contractStatusSchema>;
 export type IntentContract = z.infer<typeof intentContractSchema>;
 export type ExecutionAttempt = z.infer<typeof executionAttemptSchema>;

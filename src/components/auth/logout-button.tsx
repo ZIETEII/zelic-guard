@@ -17,14 +17,14 @@ export function LogoutButton() {
       const response = await fetch("/api/auth/logout", { method: "POST" });
       const body: unknown = await response.json();
       if (!response.ok) {
-        setError("Sign out failed safely. Try again.");
+        setError("El cierre de sesión falló de forma segura. Inténtalo de nuevo.");
         return;
       }
       logoutSuccessSchema.parse(body);
       router.push("/login");
       router.refresh();
     } catch {
-      setError("Sign out failed safely. Try again.");
+      setError("El cierre de sesión falló de forma segura. Inténtalo de nuevo.");
     } finally {
       setPending(false);
     }
@@ -39,7 +39,7 @@ export function LogoutButton() {
         disabled={pending}
       >
         <span aria-hidden="true">↗</span>
-        {pending ? "Signing out…" : "Sign out"}
+        {pending ? "Cerrando sesión…" : "Cerrar sesión"}
       </button>
       {error ? <span className="session-error" role="alert">{error}</span> : null}
     </span>

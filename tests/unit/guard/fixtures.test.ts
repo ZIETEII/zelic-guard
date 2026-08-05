@@ -62,7 +62,7 @@ describe("createInvoiceScenarioFixtures", () => {
 
   it("declares simulation and server-only boundaries", () => {
     expect(SIMULATION_DISCLOSURE).toBe(
-      "Simulation only — no email or payment is sent.",
+      "Simulación. No se envía ningún correo ni pago.",
     );
     expect(FIXTURE_RUNTIME_BOUNDARY).toContain("server-only");
     expect(FIXTURE_RUNTIME_BOUNDARY).toContain("node:crypto");

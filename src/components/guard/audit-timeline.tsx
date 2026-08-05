@@ -12,12 +12,13 @@ interface AuditTimelineProps {
 export function AuditTimeline({ items }: AuditTimelineProps) {
   return (
     <section className="audit-panel" aria-labelledby="audit-title">
+      {/* Registrar: quién, qué, cuándo y bajo qué regla — §7.3 */}
       <div className="panel-heading audit-heading">
         <div>
-          <span className="section-kicker">DETERMINISTIC EVIDENCE</span>
-          <h2 id="audit-title">Deterministic audit timeline</h2>
+          <span className="section-kicker">EVIDENCIA DETERMINISTA</span>
+          <h2 id="audit-title">Traza de auditoría</h2>
         </div>
-        <span className="event-count">{items.length} events</span>
+        <span className="event-count">{items.length} eventos</span>
       </div>
 
       {items.length ? (
@@ -34,7 +35,7 @@ export function AuditTimeline({ items }: AuditTimelineProps) {
       ) : (
         <div className="audit-empty">
           <span aria-hidden="true" />
-          <p>No audit events yet.</p>
+          <p>Todavía no hay eventos registrados.</p>
         </div>
       )}
     </section>

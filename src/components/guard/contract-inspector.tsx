@@ -5,6 +5,7 @@ interface ContractInspectorProps {
   readonly contract: IntentContract | null;
   readonly compiler: CompileIntentResponse["compiler"] | null;
   readonly approving: boolean;
+  readonly esAccionPrimaria: boolean;
   readonly onApprove: () => void;
 }
 
@@ -12,73 +13,104 @@ export function ContractInspector({
   contract,
   compiler,
   approving,
+  esAccionPrimaria,
   onApprove,
 }: ContractInspectorProps) {
   if (!contract) {
+    const emptyApproveHint = "Compila la intención para habilitar la aprobación del contrato.";
+
     return (
-      <div className="contract-inspector empty-state" aria-label="Contract inspector">
+      <div className="contract-inspector empty-state" aria-label="Inspector de contrato">
         <div className="empty-state-mark" aria-hidden="true">{"{ }"}</div>
-        <p>No contract compiled.</p>
-        <span>Compile the intent to create a reviewable authority snapshot.</span>
-        <button className="button-secondary" type="button" disabled>
-          Approve contract
+        <p>Ningún contrato compilado.</p>
+        <span>Compila la intención para obtener una autoridad revisable.</span>
+        <button
+          className="button-secondary"
+          type="button"
+          disabled
+          title={emptyApproveHint}
+          aria-label="Aprobar contrato"
+        >
+          Aprobar contrato
         </button>
+        <p className="button-state-note" role="status" aria-live="polite">
+          {emptyApproveHint}
+        </p>
       </div>
     );
   }
 
+  const contractCanBeApproved = contract.status === "proposed" && !approving;
+  const approveHint = !contractCanBeApproved
+    ? approving
+      ? "Aprobando contrato..."
+      : "Solo se puede aprobar un contrato propuesto."
+    : null;
+
+  // Autoridad en interfaz: Permitido · Requiere aprobación · Prohibido — §4.3
+  const etiquetaEstado =
+    contract.status === "approved" ? "APROBADO" : "REQUIERE APROBACIÓN";
+
   return (
-    <div className="contract-inspector" aria-label="Contract inspector">
+    <div className="contract-inspector" aria-label="Inspector de contrato">
       <div className="inspector-heading">
         <div>
-          <span className="section-kicker">AUTHORITY SNAPSHOT</span>
-          <h3>Contract inspector</h3>
+          <span className="section-kicker">AUTORIDAD APROBADA</span>
+          <h3>Inspector de contrato</h3>
         </div>
         <span className={`status-badge status-${contract.status}`}>
           <span className="status-dot" aria-hidden="true" />
-          {contract.status.toUpperCase()}
+          {etiquetaEstado}
         </span>
       </div>
 
       <dl className="contract-fields">
-        <ContractField label="Action" value={contract.action} />
-        <ContractField label="Channel" value={contract.channel} />
-        <ContractField label="Target" value={contract.target} />
+        <ContractField label="Acción" value={contract.action} />
+        <ContractField label="Canal" value={contract.channel} />
+        <ContractField label="Destino" value={contract.target} />
         <ContractField
-          label="Recipient"
+          label="Destinatario"
           value={contract.constraints.allowedRecipients[0]}
           wide
         />
-        <ContractField label="Max cost" value={`$${contract.constraints.maxCost.toFixed(2)}`} />
-        <ContractField label="Max runs" value={String(contract.constraints.maxRuns)} />
-        <ContractField label="Expiry" value={formatDate(contract.constraints.expiresAt)} wide />
+        <ContractField label="Costo máximo" value={`$${contract.constraints.maxCost.toFixed(2)}`} />
+        <ContractField label="Ejecuciones máximas" value={String(contract.constraints.maxRuns)} />
+        <ContractField label="Vencimiento" value={formatDate(contract.constraints.expiresAt)} wide />
         <ContractField
-          label="Resource fingerprint"
+          label="Huella del recurso"
           value={contract.constraints.resourceFingerprint}
           wide
           hash
         />
-        <ContractField label="Contract fingerprint" value={contract.fingerprint} wide hash />
+        <ContractField label="Huella del contrato" value={contract.fingerprint} wide hash />
       </dl>
 
       <div className="authority-actions">
         <button
           className="button-authority"
           type="button"
+          data-activa={esAccionPrimaria}
           onClick={onApprove}
-          disabled={contract.status !== "proposed" || approving}
+          disabled={!contractCanBeApproved}
+          title={approveHint ?? "Aprobar contrato"}
+          aria-label="Aprobar contrato"
         >
-          {approving ? "Approving…" : "Approve contract"}
+          {approving ? "Aprobando…" : "Aprobar contrato"}
         </button>
+        {approveHint ? (
+          <p className="button-state-note" role="status" aria-live="polite">
+            {approveHint}
+          </p>
+        ) : null}
         {compiler ? (
           <span className="compiler-caption">
-            Verified by {compiler.provider === "seeded" ? "deterministic compiler" : compiler.model}
+            Verificado por {compiler.provider === "seeded" ? "el compilador determinista" : compiler.model}
           </span>
         ) : null}
       </div>
 
       <details className="json-disclosure">
-        <summary>Authority JSON</summary>
+        <summary>Autoridad en JSON</summary>
         <pre>{JSON.stringify(contract, null, 2)}</pre>
       </details>
     </div>

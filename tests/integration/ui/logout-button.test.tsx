@@ -26,10 +26,10 @@ describe("operator logout", () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
     render(<LogoutButton />);
 
-    await user.click(screen.getByRole("button", { name: "Sign out" }));
+    await user.click(screen.getByRole("button", { name: "Cerrar sesión" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Sign out failed safely. Try again.",
+      "El cierre de sesión falló de forma segura. Inténtalo de nuevo.",
     );
     expect(router.push).not.toHaveBeenCalled();
   });

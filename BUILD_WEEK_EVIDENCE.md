@@ -872,3 +872,139 @@ Path=/; Max-Age=14400; Secure; HttpOnly; SameSite=strict; Priority=high
 Real-browser production acceptance at 1440×960 reproduced the complete public → protected → login → compile → approve → threat suite → logout path. The final authenticated report contained five outcomes, `Allowed 1 · Blocked 4`, and seven audit events with `scrollWidth === innerWidth === 1440`. At 390×844, all five rows and the sign-out control remained visible with `scrollWidth === innerWidth === 390`. Both console scans were empty. After logout, a direct `/workspace` request redirected to `/login` again.
 
 `vercel inspect` confirmed `status Ready`, target `production`, and the canonical alias. A deployment-scoped error-log query for the preceding hour returned no errors after the complete browser exercise.
+
+### T064 revisable authority parameters and persistent theme
+
+Focused command:
+
+```bash
+npm run test:run -- tests/unit/guard/revise-contract.test.ts tests/integration/api/revise-route.test.ts tests/integration/ui/theme-toggle.test.tsx
+```
+
+- **RED:** 2026-07-19 09:07 America/Bogota, all three collections failed because the revision engine, `/api/revise` boundary, and theme selector did not exist.
+- **GREEN:** the focused files passed 5/5 after adding strict Zod revision input, a freshly fingerprinted proposed snapshot, and a persisted dark/light selector.
+- **Authority invariant:** a revision always returns `PROPOSED`; Mission Control clears verdict, run history, counters, threat-suite results, and selected scenario before a human can approve the new snapshot.
+- **Full GREEN:** `npm run lint`, `npm run typecheck`, `npm run test:run`, and `npm run build` all exited 0. Vitest passed 27 files and 121 tests.
+
+Local real-browser acceptance at 1440×960 compiled and approved the seeded simulation, executed one safe run, then revised the recipient and cost. The application visibly returned to proposed authority, disabled **Safe run**, reset `Allowed 1 · Blocked 0` to `Allowed 0 · Blocked 0`, and recorded `Authority parameters revised`. Switching to light mode persisted the preference, applied `data-theme="light"`, retained contrast, and produced no horizontal overflow. At 390×844, both theme directions, the parameter editor, and the compiled authority remained usable with `scrollWidth === innerWidth === 390`; browser console logs contained no warnings or errors.
+
+### T065 LogVox brand system
+
+Presentation-layer work: the policy engine, its rule identifiers, reason codes, and API messages were left untouched, so no domain RED cycle applies. Spanish rule copy lives in a presentation map inside `execution-gate.tsx`, keeping the engine output stable for integrators.
+
+Applied from **LogVox Manual de marca 1.0** (Brand OS 1.2), sourced from the master package:
+
+- **Lock-up (§1.7):** `ZELIC Guard` over `by LogVox`. ZELIC Guard is presented as a product capability, never as an independent brand.
+- **Monogram (§3.1):** master SVG geometry reproduced unmodified; only the V body alternates between the two official colour versions — white on dark, Graphite on light (§7.5).
+- **Colour (§4.1–4.4):** official neutral and orange ramps, Obsidian canvas, Graphite surfaces. Interface authority states use `Permitido`, `Requiere aprobación`, `Prohibido` (§4.3).
+- **One orange signal (§4.4) and one primary action (§7.2):** the single Signal Orange fill follows the active workflow step — compile, then approve, then execute — driven by `data-activa`. Verified in-browser: exactly one orange fill at every stage.
+- **Type (§5):** Space Grotesk (display/UI), Space Mono (data, state, code, labels), Inter Light (body). Labels are uppercase mono at +13% tracking; negative tracking only above 34 px; tabular numerals in dashboards.
+- **Product tokens (§7.1):** container radius capped at 6 px, motion at 120/180/240 ms on `cubic-bezier(.2,0,0,1)`, no shadows in dark mode, hierarchy by luminance plus a 1 px border.
+- **Focus (§7.2):** 2 px Signal Orange ring at 2 px offset on every control.
+- **La Traza (§6.1):** hero field derived from the master banner and rendered fully passive in Steel at 30%, because the piece's active orange signal is the primary button.
+- **Declared state (§4.3, §7.2, §9.2):** the product reports `PROTOTIPO FUNCIONAL` — built and verifiable, without full real operation. The simulation disclosure remains explicit.
+
+Two defects were found and fixed during verification:
+
+1. **Contrast:** the light-mode primary fill used Orange 600 with white 13 px text at 3.59:1, failing AA. The manual reserves Orange 600 for non-textual graphics (§4.2); the fill now uses Orange 700 at 5.19:1.
+2. **Hydration:** pre-existing. `ThemeToggle` wrote `data-theme` onto the same `<html>` React hydrates, and the server emitted no such attribute, producing a hydration-mismatch console error. The server now renders `data-theme="dark"` with `suppressHydrationWarning`.
+
+`vitest.config.ts` raises `testTimeout` to 20 s: the UI integration files chain more than ten `userEvent` interactions with full jsdom re-render, and the 5 s default produced timing — not functional — failures when all 27 files ran in parallel.
+
+Verification commands, all exited 0:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:run
+npm run build
+```
+
+Vitest passed 27 files and 121 tests. Real-browser acceptance at 1440×900 and 375×812 ran the full compile → approve → threat suite path in both themes, reaching `Permitidas 1 · Prohibidas 4` with five stacked results, `scrollWidth === clientWidth` at both widths, and empty console scans. An automated contrast sweep over every visible text node reported 0 AA failures in dark and light; disabled controls are exempt under WCAG 2.2 (1.4.3).
+
+### T065 preview deployment
+
+Deployed 2026-08-01 as a **preview**, deliberately not production, so the
+canonical Build Week alias keeps serving the delivered English build while the
+LogVox rebrand is reviewed.
+
+- Deployment: `dpl_H63aGojGtwRjm4Hy5x4RSWKtkv8h`
+- Preview URL: `https://zelic-guard-build-week-h3ap9651h-queenietv10-8161s-projects.vercel.app`
+- `readyState: READY`, `target: null` — the null target is what confirms it is not production.
+
+Commits `b443f6e`, `6eadbd0` and `43e5d83` were pushed to
+`origin/codex/revisable-authority-theme` without amending or rewriting history;
+the scaffold commit `c2d047b` remains reachable.
+
+Both endpoints were checked immediately after the deploy:
+
+- Production `https://zelic-guard-build-week.vercel.app/` returned HTTP 200 and
+  still serves `<title>ZELIC Guard — Intent Contracts for AI Agents</title>`, the
+  pre-rebrand English build. Untouched, as intended.
+- The preview returns HTTP 302 to `vercel.com/sso-api`. Vercel Deployment
+  Protection is enabled on this project, so the preview is reachable only with an
+  authenticated Vercel session and is not publicly accessible. No credentials
+  were handled to verify it.
+
+Promotion to production is a separate, explicit step (`vercel deploy --prod`) and
+was not performed.
+
+### T066 LogVox icon integrity and production diagnosis
+
+A photo of the public browser tab showed a triangular mark that looked like
+Vercel rather than the LogVox monogram. The first byte-hash comparison suggested
+that `src/app/favicon.ico` differed from the one-size master ICO. Replacing it
+byte-for-byte was rejected by the production build because Next.js 16 cannot
+decode the master's RGB-only embedded PNG (`The PNG is not in RGBA format`).
+
+A frame-level comparison then established the correct result: the project's
+Next-compatible ICO contains 16, 32, and 48 px RGBA frames, and each frame is
+pixel-identical to the canonical `favicon-16.png`, `favicon-32.png`, and
+`favicon-48.png` files in the read-only LogVox Brand Assets package. The project
+`icon.svg` and `apple-icon.png` also match their approved masters. The failed
+byte-for-byte replacement was reverted.
+
+The actual public defect is release state: production still serves the earlier
+pre-LogVox English build, while the LogVox-branded branch had only been deployed
+as a protected preview. No production promotion occurred during this diagnosis.
+
+A new architecture test pins the approved build artifacts:
+
+```bash
+npm run test:run -- tests/architecture/branding-assets.test.ts
+```
+
+Observed on 2026-08-05: exit 0; 1 file and 3/3 approved LogVox icon checks passed.
+The test documents why the compatible multi-size ICO has a different byte hash
+from the broken one-size master while preserving the canonical pixels exactly.
+
+### T066 production promotion
+
+External action contract `publicar-zelic-guard-logvox-20260805` was approved by
+ZIETE (Johan Sebastian Arango Leon) via Telegram with scope
+`execute_external_action`, USD 0 maximum cost, no deletions, and no authority to
+change DNS, environment variables, secrets, accounts, Git history, or other
+projects. A subsequent `openspec.get_change` returned `status: approved` and
+confirmed the latest event type was `approval` before execution.
+
+`npx vercel deploy --prod --yes` created production deployment
+`dpl_6pQXxopk7antYErVWzy1Bp8uUUip`. Vercel reported `Ready` and attached the
+project's existing production aliases, including:
+
+- `https://zelicguard.logvox.com`
+- `https://zelic-guard-build-week.vercel.app`
+
+No DNS record, domain configuration, environment variable, credential, account,
+commit, remote, or other project was modified.
+
+Post-deploy verification observed:
+
+- Both public aliases returned HTTP 200 from Vercel.
+- Both served title `ZELIC Guard by LogVox — Contratos de intención para agentes`.
+- The page rendered the official LogVox monogram, `ZELIC Guard`, `BY LOGVOX`,
+  `PROTOTIPO FUNCIONAL`, and the explicit simulation-only disclosure.
+- `/favicon.ico`, `/icon.svg`, and `/apple-icon.png` each returned HTTP 200 and
+  matched their approved SHA-256 hashes exactly.
+- Browser-console verification returned 0 messages and 0 JavaScript errors.
+- Visual capture showed no Vercel or unrelated logo presented as product identity;
+  `OPENAI BUILD WEEK` remains a contextual event label rather than the brand.
