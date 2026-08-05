@@ -948,3 +948,63 @@ Both endpoints were checked immediately after the deploy:
 
 Promotion to production is a separate, explicit step (`vercel deploy --prod`) and
 was not performed.
+
+### T066 LogVox icon integrity and production diagnosis
+
+A photo of the public browser tab showed a triangular mark that looked like
+Vercel rather than the LogVox monogram. The first byte-hash comparison suggested
+that `src/app/favicon.ico` differed from the one-size master ICO. Replacing it
+byte-for-byte was rejected by the production build because Next.js 16 cannot
+decode the master's RGB-only embedded PNG (`The PNG is not in RGBA format`).
+
+A frame-level comparison then established the correct result: the project's
+Next-compatible ICO contains 16, 32, and 48 px RGBA frames, and each frame is
+pixel-identical to the canonical `favicon-16.png`, `favicon-32.png`, and
+`favicon-48.png` files in the read-only LogVox Brand Assets package. The project
+`icon.svg` and `apple-icon.png` also match their approved masters. The failed
+byte-for-byte replacement was reverted.
+
+The actual public defect is release state: production still serves the earlier
+pre-LogVox English build, while the LogVox-branded branch had only been deployed
+as a protected preview. No production promotion occurred during this diagnosis.
+
+A new architecture test pins the approved build artifacts:
+
+```bash
+npm run test:run -- tests/architecture/branding-assets.test.ts
+```
+
+Observed on 2026-08-05: exit 0; 1 file and 3/3 approved LogVox icon checks passed.
+The test documents why the compatible multi-size ICO has a different byte hash
+from the broken one-size master while preserving the canonical pixels exactly.
+
+### T066 production promotion
+
+External action contract `publicar-zelic-guard-logvox-20260805` was approved by
+ZIETE (Johan Sebastian Arango Leon) via Telegram with scope
+`execute_external_action`, USD 0 maximum cost, no deletions, and no authority to
+change DNS, environment variables, secrets, accounts, Git history, or other
+projects. A subsequent `openspec.get_change` returned `status: approved` and
+confirmed the latest event type was `approval` before execution.
+
+`npx vercel deploy --prod --yes` created production deployment
+`dpl_6pQXxopk7antYErVWzy1Bp8uUUip`. Vercel reported `Ready` and attached the
+project's existing production aliases, including:
+
+- `https://zelicguard.logvox.com`
+- `https://zelic-guard-build-week.vercel.app`
+
+No DNS record, domain configuration, environment variable, credential, account,
+commit, remote, or other project was modified.
+
+Post-deploy verification observed:
+
+- Both public aliases returned HTTP 200 from Vercel.
+- Both served title `ZELIC Guard by LogVox — Contratos de intención para agentes`.
+- The page rendered the official LogVox monogram, `ZELIC Guard`, `BY LOGVOX`,
+  `PROTOTIPO FUNCIONAL`, and the explicit simulation-only disclosure.
+- `/favicon.ico`, `/icon.svg`, and `/apple-icon.png` each returned HTTP 200 and
+  matched their approved SHA-256 hashes exactly.
+- Browser-console verification returned 0 messages and 0 JavaScript errors.
+- Visual capture showed no Vercel or unrelated logo presented as product identity;
+  `OPENAI BUILD WEEK` remains a contextual event label rather than the brand.
